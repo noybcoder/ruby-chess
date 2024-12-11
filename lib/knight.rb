@@ -9,7 +9,6 @@ class Knight < Chess
       [2, 1], [1, 2], [-1, 2], [-2, 1],
       [-2, -1], [-1, -2], [1, -2], [2, -1]
     ]
-    @skip_pieces = true
     @continuous_movement = false
   end
 end

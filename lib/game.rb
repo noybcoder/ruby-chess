@@ -48,38 +48,36 @@ class Game
   end
 
   def path?(piece, destination)
-    paths = []
+    piece.possible_moves.each do |move|
+      path = build_path(move, piece, destination)
+      return path if unblocked_path?(path[-1], destination, path[0...-1])
+    end
+    nil
+  end
 
+  def build_path(move, piece, destination)
+    path = []
+    current = piece.current_position
     loop do
-      paths = find_path(piece, paths, destination)
-      break if met_path_conditions?(piece, paths, destination)
-    end
-
-    has_location?(paths, destination)
-  end
-
-  def find_path(piece, paths, destination)
-    paths = piece.possible_moves.map.with_index do |move, idx|
-      current = paths.empty? ? piece.current_position : paths[idx]
-      next unless current
-
       new_loc = [move[0] + current[0], move[1] + current[1]]
-      new_loc if valid?(new_loc)
-      p "#{new_loc}: #{piece.skip_pieces || !has_location?(all_locations, new_loc)}"
-      # new_loc if clear_path?(new_loc, piece, , destination)
+      path << new_loc
+      break if met_path_conditions?(piece, new_loc, destination)
+
+      current = new_loc
     end
+    path
   end
 
-  def met_path_conditions?(piece, paths, destination)
-    !piece.continuous_movement || has_location?(paths, destination) || paths.none?
+  def met_path_conditions?(piece, location, destination)
+    !piece.continuous_movement || !valid?(location) || destination?(location, destination)
   end
 
-  def clear_path?(location, piece, paths, destination)
-    valid?(location) && unblocked_path?(piece, paths, destination)
+  def destination?(location, destination)
+    location == destination
   end
 
-  def unblocked_path?(piece, paths, location, destination)
-    (!piece.skip_pieces || (paths & all_locations).empty? && !has_location?(all_locations, destination))
+  def unblocked_path?(location, destination, path)
+    destination?(location, destination) && empty_path?(path, all_locations)
   end
 
   def all_locations
@@ -90,9 +88,8 @@ class Game
     location.all? { |coord| coord.between?(low, high) }
   end
 
-  def has_location?(paths, destination)
-    paths.include?(destination)
-    # !((paths & destination).empty?)
+  def empty_path?(path, destination)
+    (path & destination).empty?
   end
 
   def opponent(player)
@@ -101,11 +98,10 @@ class Game
 
   def change_state(destination, piece)
     board.layout[destination[0]][destination[1]] = nil if board.layout[destination[0]][destination[1]]
-
-
     board.layout[piece.current_position[0]][piece.current_position[1]] = nil
     board.layout[destination[0]][destination[1]] = piece
     piece.current_position = destination
+    piece.reset_moves if piece.double_step
   end
 end
 
@@ -123,7 +119,6 @@ game.parse_notation(player2)
 board.display_board
 game.parse_notation(player2)
 board.display_board
-
 
 # paths = [
 #   nil, [6, 4], [7, 4], nil, [6, 3], nil, [7, 2], [6, 2]
@@ -143,4 +138,4 @@ board.display_board
 # piece = player2.knight[0]
 # destination = [5, 2]
 
-# p piece.skip_pieces || (paths & game.all_locations).empty? && !game.has_location?(game.all_locations, destination)
+# game.path?(player2.pawn[0], [4, 0])
