@@ -23,4 +23,18 @@ module Parseable
   def parse_destination(move_elements)
     [move_elements[3][-1].to_i - 1, board.files.find_index(move_elements[3][0])]
   end
+
+  def parse_promotion(move_elements)
+    promotion = move_elements[-2]
+
+  end
+
+  def parse_castling(move_elements, player)
+    castling = move_elements[-1]
+    case castling
+    in /^(0-0|O-O)$/ then [player.king[0], player.rook[0], 'king_castling']
+    in /^(0-0-0|O-O-O)$/ then [player.king[0], player.rook[1], 'queen_castling']
+    else nil
+    end
+  end
 end

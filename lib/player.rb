@@ -43,7 +43,7 @@ class Player
   end
 
   def create_pieces(key, count, col)
-    piece = Object.const_get(key).new(*([count + 1] if key == :Pawn))
+    piece = Object.const_get(key).new(*([count + 1] if %i[Pawn Rook King].include?(key)))
     row = key == :Pawn ? count * 5 + 1 : count * 7
     fill_piece_info(piece, key, count, row, col)
     instance_variable_get("@#{key.to_s.downcase}") << piece
