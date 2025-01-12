@@ -29,7 +29,7 @@ class Game
 
     loop do
       move = player.make_move
-      pattern = /^([KQRBN]?)([a-h]?[1-8]?)([x:]?)([a-h]{1}[1-8]{1})([KQRBN]?)$|^([O0][-[O0]]+)$/
+      pattern = /^([KQRBN]?)([a-h]?[1-8]?)([x:]?)([a-h]{1}[1-8]{1})(=[KQRBN]?)$|^([O0][-[O0]]+)$/
       return move.scan(pattern).flatten if move.match(pattern)
 
       puts 'It is not a valid move. Please try again.'
@@ -38,29 +38,33 @@ class Game
 
   def parse_notation(player)
     move_elements = validate_move(player)
-    # if move_elements.last
-    #   king, rook, castling = parse_castling(move_elements, player)
-    #   king.checked_positions = checked_moves(king, player)
-    #   if castling?(king, rook, player, castling)
-    #     [king, rook].each do |piece|
-    #       castling_position = piece.instance_variable_get("@#{castling}")
-    #       board.layout[piece.current_position[0]][piece.current_position[1]] = nil
-    #       board.layout[castling_position[0]][castling_position[1]] = piece
-    #       piece.current_position = castling_position
-    #     end
-    #   else
-    #     puts 'Invalid move.'
-    #   end
-    # else
-    #   pieces = parse_piece(PIECE_STATS, move_elements, player)
-    #   origin, idx = parse_origin(move_elements)
-    #   destination = parse_destination(move_elements)
-    #   active_piece = pieces.find do |piece|
-    #     game_paths(piece, player, destination) && (!origin || (piece.current_position.values_at(*idx) & origin).any?)
-    #   end
-    #   change_state(player, destination, active_piece)
-    # end
-    move_elements
+    if move_elements.last
+      king, rook, castling = parse_castling(move_elements, player)
+      king.checked_positions = checked_moves(king, player)
+      if castling?(king, rook, player, castling)
+        [king, rook].each do |piece|
+          castling_position = piece.instance_variable_get("@#{castling}")
+          configure_movements(piece, castling_position)
+        end
+      else
+        puts 'Invalid move'
+      end
+    else
+      pieces = parse_piece(PIECE_STATS, move_elements, player)
+      origin, idx = parse_origin(move_elements)
+      destination = parse_destination(move_elements)
+      active_piece = pieces.find do |piece|
+        game_paths(piece, player, destination) && (!origin || (piece.current_position.values_at(*idx) & origin).any?)
+      end
+      if active_piece.is_a?(Pawn)
+        promoted_piece = parse_promotion(PIECE_STATS, move_elements, player)
+        result = promoted_piece.find{ |piece| piece.current_position.nil?}
+
+      end
+
+      change_state(player, destination, active_piece)
+    end
+    promoted_piece
   end
 
   def checked_mate?(king, player)
@@ -174,13 +178,18 @@ class Game
     (@players - [player])[0]
   end
 
-  def change_state(player, destination, piece)
-    opp_loc = en_passant?(player, destination) ? en_passant_opponent(player, destination).current_position : destination
-    board.layout[opp_loc[0]][opp_loc[1]] = nil
+  def configure_movements(piece, destination)
     board.layout[piece.current_position[0]][piece.current_position[1]] = nil
     board.layout[destination[0]][destination[1]] = piece
     piece.current_position = destination
-    piece.reset_moves if piece.double_step
+    piece.reset_moves if piece.is_a?(Pawn) || piece.is_a?(King) || piece.is_a?(Rook)
+
+  end
+
+  def change_state(player, destination, piece)
+    opp_loc = en_passant?(player, destination) ? en_passant_opponent(player, destination).current_position : destination
+    board.layout[opp_loc[0]][opp_loc[1]] = nil
+    configure_movements(piece, destination)
   end
 
 end
@@ -243,4 +252,5 @@ game = Game.new([player1, player2], board)
 # board.layout[0][4] = nil
 # player2.king[0].current_position = [1, 3]
 
+board.display_board
 p game.parse_notation(player1)

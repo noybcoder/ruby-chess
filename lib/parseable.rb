@@ -24,9 +24,8 @@ module Parseable
     [move_elements[3][-1].to_i - 1, board.files.find_index(move_elements[3][0])]
   end
 
-  def parse_promotion(move_elements)
-    promotion = move_elements[-2]
-
+  def parse_promotion(piece_stats, move_elements, player)
+    parse_piece(piece_stats, move_elements[-2][-1], player)
   end
 
   def parse_castling(move_elements, player)
