@@ -12,6 +12,7 @@ class King < Chess
     @continuous_movement = false
     @king_castling = player_number == 1 ? [0, 2] : [7, 2]
     @queen_castling = player_number == 1 ? [0, 6] : [7, 6]
+    @castling_type = nil
     @checked_positions = nil
   end
 

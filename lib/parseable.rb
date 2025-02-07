@@ -1,9 +1,13 @@
 # frozen_string_literal: true
 
 module Parseable
-  def parse_piece(piece_stats, move_elements, player)
-    piece = piece_stats.find { |_k, v| v[:letter] == move_elements[0] }&.first || :Pawn
+  def identify_piece(piece_stats, element, player)
+    piece = piece_stats.find { |_k, v| v[:letter] == element }&.first || :Pawn
     player.instance_variable_get("@#{piece.downcase}")
+  end
+
+  def parse_piece(piece_stats, move_elements, player)
+    identify_piece(piece_stats, move_elements[0], player)
   end
 
   def parse_origin(move_elements)
@@ -25,15 +29,18 @@ module Parseable
   end
 
   def parse_promotion(piece_stats, move_elements, player)
-    parse_piece(piece_stats, move_elements[-2][-1], player)
+    identify_piece(piece_stats, move_elements[-2][-1], player)
   end
 
   def parse_castling(move_elements, player)
     castling = move_elements[-1]
     case castling
-    in /^(0-0|O-O)$/ then [player.king[0], player.rook[0], 'king_castling']
-    in /^(0-0-0|O-O-O)$/ then [player.king[0], player.rook[1], 'queen_castling']
-    else nil
+    when /^(0-0|O-O)$/
+      player.king[0].castling_type = 'king_castling'
+      [player.king[0], player.rook[0]]
+    when /^(0-0-0|O-O-O)$/
+      player.king[0].castling_type = 'queen_castling'
+      [player.king[0], player.rook[1]]
     end
   end
 end
