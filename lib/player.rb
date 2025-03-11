@@ -18,7 +18,7 @@ class Player
 
   @player_count = 0
   PLAYER_LIMIT = 2
-  attr_accessor :king, :queen, :rook, :bishop, :knight, :pawn
+  attr_accessor :king, :queen, :rook, :bishop, :knight, :pawn, :notation
 
   def initialize
     @king = []
@@ -27,6 +27,7 @@ class Player
     @bishop = []
     @knight = []
     @pawn = []
+    @notation = Array.new(6)
     self.class.player_count += 1
     handle_game_violations(PlayerLimitViolation, self.class.player_count, PLAYER_LIMIT)
     assign_chess_pieces
@@ -61,9 +62,5 @@ class Player
 
   def piece_locations
     retrieve_pieces.map(&:current_position)
-  end
-
-  def make_move
-    gets.chomp
   end
 end

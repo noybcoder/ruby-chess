@@ -6,10 +6,16 @@ module Traceable
   end
 
   def combine_paths(moves, piece, player, destination = nil)
+    return [] if moves.nil?
+
     moves.filter_map do |move|
       path = build_path(piece.current_position, move, piece, destination)
-      path if unblocked_path?(path.last, destination, path, player)
+      path if unblocked_path?(path.last, destination, path, player) && double_step_limited?(piece, destination)
     end
+  end
+
+  def double_step_limited?(piece, destination)
+    !piece.is_a?(Pawn) || (destination[0] - piece.current_position[0]).abs <= 2
   end
 
   def piece_moves(player, destination, piece)
@@ -39,15 +45,15 @@ module Traceable
     return true unless destination
 
     all_locations = player.piece_locations + opponent(player).piece_locations
-    location == destination && empty_path?(path[0...-1],
-                                           all_locations) && empty_path?(player.piece_locations, [destination])
+    (location == destination) && empty_path?(path[0...-1],
+                                             all_locations) && empty_path?(player.piece_locations, [destination])
   end
 
   def valid?(location, low = 0, high = 7)
     location.all? { |coord| coord.between?(low, high) }
   end
 
-  def empty_path?(path, destination)
-    (path & destination).empty?
+  def empty_path?(*locations)
+    locations.reduce(:&).empty?
   end
 end

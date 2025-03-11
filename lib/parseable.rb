@@ -37,10 +37,10 @@ module Parseable
     case castling
     when /^(0-0|O-O)$/
       player.king[0].castling_type = 'king_castling'
-      [player.king[0], player.rook[0]]
+      [player.king[0], player.rook[0], 'O-O']
     when /^(0-0-0|O-O-O)$/
       player.king[0].castling_type = 'queen_castling'
-      [player.king[0], player.rook[1]]
+      [player.king[0], player.rook[1], 'O-O-O']
     end
   end
 end
