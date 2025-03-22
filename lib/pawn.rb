@@ -13,7 +13,7 @@ class Pawn < Chess
 
   def reset_moves
     @first_move = false
-    @continuous_movement = false
+    @continuous_movement = @first_move
   end
 
   def promoted_position?

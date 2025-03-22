@@ -7,13 +7,12 @@ module Exceptionable
 
   def check_now?(player)
     king = player.king[0]
+    return true if king.current_position.nil?
 
     checked?(king.current_position, player).any?
   end
 
   def check_next?(player)
-    return false if checked_moves(player).empty? || opponent_next_moves(player).empty?
-
     (checked_moves(player) - opponent_next_moves(player)).empty?
   end
 
@@ -25,13 +24,17 @@ module Exceptionable
     king = player.king[0]
     return [] if king.checked_positions.nil?
 
-    king.checked_positions.select { |location| checked?(location, player).any? }
+    king.checked_positions.select { |location| checked?(location, player, true).any? }
   end
 
   def pawn_next_moves(player)
-    opponent_pawns(player).filter_map do |pawn|
+    result = opponent_pawns(player).filter_map do |pawn|
       combine_paths(pawn.capture_moves, pawn, player)
     end.flatten(2).uniq
+
+    opponent_pawns(player).each { |pawn| pawn.continuous_movement = true if pawn.first_move == true }
+
+    result
   end
 
   def checked_moves(player)
@@ -65,8 +68,8 @@ module Exceptionable
     start_file < end_file ? Array(start_file + 1...end_file) : Array(end_file + 1...start_file)
   end
 
-  def checked?(location, player)
-    opponent(player).retrieve_pieces.select { |piece| game_paths(piece, opponent(player), location) }
+  def checked?(location, player, check = false)
+    opponent(player).retrieve_pieces.select { |piece| game_paths(piece, opponent(player), location, check) }
   end
 
   def en_passant?(player, destination)
@@ -78,7 +81,7 @@ module Exceptionable
   end
 
   def prove_en_passant(piece, player, destination)
-    piece.is_a?(Pawn) && !empty_path?([piece.double_step[0]], [destination]) && en_passant_target(player, destination)
+    en_passant_target(player, destination) && pawn_blocked?([piece.double_step[0]], [destination], piece)
   end
 
   def en_passant_pawns(player, &block)

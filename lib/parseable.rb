@@ -34,6 +34,7 @@ module Parseable
 
   def parse_castling(move_elements, player)
     castling = move_elements[-1]
+
     case castling
     when /^(0-0|O-O)$/
       player.king[0].castling_type = 'king_castling'

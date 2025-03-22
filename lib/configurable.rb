@@ -36,10 +36,10 @@ module Configurable
   end
 
   def define_promoted_piece(active_piece, move_elements, piece_stats, player, destination)
-    if promotable?(active_piece) && (player.is_a?(Computer) || !move_elements[-2][-1].nil?)
+    if valid_promotion?(active_piece, player, move_elements)
       promoted_piece = promotion(piece_stats, move_elements, player)
       validate_promotion(player, destination, piece_stats, active_piece, promoted_piece)
-    elsif !promotable?(active_piece) && (player.is_a?(Computer) || move_elements[-2][-1].nil?)
+    elsif valid_promotion?(active_piece, player, move_elements, negate: true)
       change_state(player, destination, piece_stats, active_piece, nil)
       true
     else
@@ -47,9 +47,14 @@ module Configurable
     end
   end
 
-  def invalid_promotion(active_piece, move_elements, _piece_stats, player, _destination)
-    return if promotable?(active_piece) && (player.is_a?(Computer) || !move_elements[-2][-1].nil?)
-    return if !promotable?(active_piece) && (player.is_a?(Computer) || move_elements[-2][-1].nil?)
+  def valid_promotion?(active_piece, player, move_elements, negate: false)
+    condition = promotable?(active_piece) || (player.is_a?(Computer) ^ !move_elements[-2][-1].nil?)
+    negate ? !condition : condition
+  end
+
+  def invalid_promotion(active_piece, move_elements, _piece_stats, player)
+    return if valid_promotion?(active_piece, player, move_elements)
+    return if valid_promotion?(active_piece, player, move_elements, negate: true)
 
     if promotable?(active_piece) && move_elements[-2][-1].nil?
       puts "\nThis should be a promotion move. Please try again.\n" if player.is_a?(Human)
@@ -100,11 +105,7 @@ module Configurable
     exchange_positions(player, destination)
     player.king[0].checked_positions = checked_moves(player)
     opponent(player).available_destinations = available_destinations(player) if opponent(player).is_a?(Computer)
-
-    piece.double_step[1] = true if prove_en_passant(piece, player, destination)
-    en_passant_target = en_passant_eligible(player)
-    standard_movements(piece, destination, promoted_piece)
-    en_passant_target.double_step[1] = false unless negate_en_passant(en_passant_target)
+    standard_movements(piece, player, destination, promoted_piece)
   end
 
   def exchange_positions(player, destination)
@@ -117,7 +118,14 @@ module Configurable
     en_passant?(player, destination) ? en_passant_opponent(player, destination).current_position : destination
   end
 
-  def standard_movements(piece, destination, promoted_piece)
+  def standard_movements(piece, player, destination, promoted_piece)
+    piece.double_step[1] = true if prove_en_passant(piece, player, destination)
+    en_passant_target = en_passant_eligible(player)
+    arrange_board(piece, destination, promoted_piece)
+    en_passant_target.double_step[1] = false unless negate_en_passant(en_passant_target)
+  end
+
+  def arrange_board(piece, destination, promoted_piece)
     target = promoted_piece.nil? ? piece : promoted_piece
     board.layout[piece.current_position[0]][piece.current_position[1]] = nil
     board.layout[destination[0]][destination[1]] = target

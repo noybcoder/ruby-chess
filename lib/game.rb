@@ -21,7 +21,6 @@ class Game
 
   def initialize(board)
     @players = register_players
-    # @players = players
     @board = board
     set_up_board
   end
@@ -52,17 +51,17 @@ class Game
   def play
     loop do
       players.each do |player|
+        if winner?(player)
+          puts "Player #{player_turn(opponent(player)) + 1} is the winner!"
+          return
+        end
         parse_notation(player)
-      end
-      if winner
-        puts "Player #{player_turn(opponent(winner)) + 1} is the winner!"
-        break
       end
     end
   end
 
-  def winner
-    players.find { |player| check_mate?(player) || player.king[0].current_position.nil? }
+  def winner?(player)
+    check_mate?(player) || player.king[0].current_position.nil?
   end
 
   def set_up_board
@@ -88,15 +87,26 @@ class Game
       move_elements = prompt_notation(player_num, player) if player.is_a?(Human)
       king, rook = player.valid_castling if player.is_a?(Computer)
 
-      next if player.is_a?(Human) && invalid_notation(move_elements)
-
-      if move_elements&.last || castling?(king, rook, player)
-        break if castling_movement(PIECE_STATS, player, move_elements)
-      elsif move_elements && move_elements.last.nil? || !castling?(king, rook, player)
-        break if non_castling_movement(PIECE_STATS, player, move_elements)
-      end
-      next
+      next if invalid_notation(move_elements, player)
+      break if process_notation(move_elements, player, king, rook)
     end
+  end
+
+  def process_notation(move_elements, player, king, rook)
+    if valid_castling?(move_elements, player, king, rook)
+      true if castling_movement(PIECE_STATS, player, move_elements)
+    elsif valid_castling?(move_elements, player, king, rook, negate: true)
+      true if non_castling_movement(PIECE_STATS, player, move_elements)
+    end
+  end
+
+  def valid_castling?(move_elements, player, king, rook, negate: false)
+    condition = move_elements&.last ^ castling?(king, rook, player)
+    negate ? !condition : condition
+  end
+
+  def valid_non_castling?(move_elements, player, king, rook)
+    move_elements && move_elements.last.nil? || !castling?(king, rook, player)
   end
 
   def prompt_notation(player_num, player)
@@ -117,81 +127,47 @@ class Game
     move.scan(pattern).flatten if move.match(pattern)
   end
 
-  def invalid_notation(move_elements)
-    return unless move_elements.nil?
+  def invalid_notation(move_elements, player)
+    return false unless move_elements.nil?
 
-    puts 'It not a valid chess notation. Please try again.'
+    puts 'It not a valid chess notation. Please try again.' if player.is_a?(Human)
     true
   end
 end
 
 board = Board.new
-# player1 = Human.new
-# Computer.instance_variable_set(:@player_count, 1)
-# player2 = Computer.new
-
 game = Game.new(board)
 
-PIECE_STATS = {
-  King: { rank_locations: [4], letter: 'K' },
-  Queen: { rank_locations: [3], letter: 'Q' },
-  Rook: { rank_locations: [0, 7], letter: 'R' },
-  Bishop: { rank_locations: [2, 5], letter: 'B' },
-  Knight: { rank_locations: [1, 6], letter: 'N' },
-  Pawn: { rank_locations: Array(0..7) }
-}.freeze
+0.upto(7) do |idx|
+  board.layout[6][idx].current_position = nil
+  board.layout[6][idx] = nil
 
-# 0.upto(7).each do |idx|
-  # unless [0, 4, 7].include?(idx)
-    # board.layout[7][idx].current_position = nil
-    # board.layout[7][idx] = nil
-  # end
+  board.layout[1][idx].current_position = nil
+  board.layout[1][idx] = nil
 
-#   board.layout[7][idx].current_position = nil
-#   board.layout[7][idx] = nil
+  unless [4].include?(idx)
+    board.layout[7][idx].current_position = nil
+    board.layout[7][idx] = nil
+  end
 
-#   board.layout[1][idx].current_position = nil
-#   board.layout[1][idx] = board.layout[6][idx]
-#   board.layout[1][idx].current_position = [1, idx]
-#   board.layout[6][idx] = nil
-# end
-
-# board.layout[1][7] = board.layout[7][6]
-# board.layout[7][6] = nil
-# player2.knight[1].current_position = [1, 7]
-# player2.knight[1].first_move = false
-
-loop do
-  game.players.each do |player|
-    # game.parse_notation(player)
-    # p player.notation.join
-    # if game.opponent(player).king[0].current_position.nil?
-    #   puts "King is defeated"
-    #   break
-    # end
-    player_num = game.players.find_index(player) + 1
-
-    # p "Checkmate? #{game.check_mate?(game.opponent(player))}"
-
-    # opponent_pawn_moves = game.opponent_pawns(player).filter_map do |pawn|
-    #   game.combine_paths(pawn.capture_moves, pawn, player)
-    # end.flatten(2).uniq
-
-    p game.pawn_next_moves(player)
-
-    loop do
-      move_elements = game.prompt_notation(player_num, player) if player.is_a?(Human)
-      king, rook = player.is_a?(Computer) ? player.valid_castling : game.parse_castling(move_elements, player)
-
-      next if player.is_a?(Human) && game.invalid_notation(move_elements)
-
-      if move_elements&.last || game.castling?(king, rook, player)
-        break if game.castling_movement(PIECE_STATS, player, move_elements)
-      elsif move_elements && move_elements.last.nil? || !game.castling?(king, rook, player)
-        break if game.non_castling_movement(PIECE_STATS, player, move_elements)
-      end
-      next
-    end
-    p player.notation.join
+  unless [3, 4].include?(idx)
+    board.layout[0][idx].current_position = nil
+    board.layout[0][idx] = nil
   end
 end
+
+# Move Player1's Queen to [6, 5] or Qf7
+board.layout[5][5] = board.layout[0][3]
+board.layout[5][5].current_position = [5, 5]
+board.layout[0][3] = nil
+
+board.layout[5][4] = board.layout[0][4]
+board.layout[5][4].current_position = [5, 4]
+board.layout[0][4] = nil
+
+board.layout[7][5] = board.layout[7][4]
+board.layout[7][5].current_position = [7, 5]
+board.layout[7][4] = nil
+
+game.players[1].king[0].checked_positions = [[6, 4], [6, 5], [6, 6], [7, 4], [7, 5], [7, 6]]
+game.play

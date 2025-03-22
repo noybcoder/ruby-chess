@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 class Chess
-  attr_accessor :unicode, :current_position, :first_move, :double_step, :checked_positions, :castling_type
-  attr_reader :possible_moves, :capture_moves, :continuous_movement, :king_castling, :queen_castling
+  attr_accessor :unicode, :current_position, :first_move, :double_step, :checked_positions, :castling_type,
+                :continuous_movement
+  attr_reader :possible_moves, :capture_moves, :king_castling, :queen_castling
 
   def initialize
     @unicode = nil
