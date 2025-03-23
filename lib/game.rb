@@ -95,18 +95,15 @@ class Game
   def process_notation(move_elements, player, king, rook)
     if valid_castling?(move_elements, player, king, rook)
       true if castling_movement(PIECE_STATS, player, move_elements)
-    elsif valid_castling?(move_elements, player, king, rook, negate: true)
+    elsif valid_castling?(move_elements, player, king, rook, negate: false)
       true if non_castling_movement(PIECE_STATS, player, move_elements)
     end
   end
 
-  def valid_castling?(move_elements, player, king, rook, negate: false)
-    condition = move_elements&.last ^ castling?(king, rook, player)
-    negate ? !condition : condition
-  end
-
-  def valid_non_castling?(move_elements, player, king, rook)
-    move_elements && move_elements.last.nil? || !castling?(king, rook, player)
+  def valid_castling?(move_elements, player, king, rook, negate: true)
+    move_elements_condition = move_elements && (negate ? !move_elements.last.nil? : move_elements.last.nil?)
+    castling_condition = negate ? castling?(king, rook, player) : !castling?(king, rook, player)
+    move_elements_condition || castling_condition
   end
 
   def prompt_notation(player_num, player)
@@ -142,32 +139,32 @@ game = Game.new(board)
   board.layout[6][idx].current_position = nil
   board.layout[6][idx] = nil
 
-  board.layout[1][idx].current_position = nil
-  board.layout[1][idx] = nil
-
-  unless [4].include?(idx)
+  unless [0, 4, 7].include?(idx)
     board.layout[7][idx].current_position = nil
     board.layout[7][idx] = nil
+
+    board.layout[1][idx].current_position = nil
+    board.layout[1][idx] = nil
   end
 
-  unless [3, 4].include?(idx)
+  unless [0, 4, 7].include?(idx)
     board.layout[0][idx].current_position = nil
     board.layout[0][idx] = nil
   end
 end
 
-# Move Player1's Queen to [6, 5] or Qf7
-board.layout[5][5] = board.layout[0][3]
-board.layout[5][5].current_position = [5, 5]
-board.layout[0][3] = nil
+# # Move Player1's Queen to [6, 5] or Qf7
+# board.layout[4][6] = board.layout[1][4]
+# board.layout[4][6].current_position = [4, 6]
+# board.layout[1][4] = nil
 
-board.layout[5][4] = board.layout[0][4]
-board.layout[5][4].current_position = [5, 4]
-board.layout[0][4] = nil
+# board.layout[6][5] = board.layout[0][3]
+# board.layout[6][5].current_position = [6, 5]
+# board.layout[0][3] = nil
 
-board.layout[7][5] = board.layout[7][4]
-board.layout[7][5].current_position = [7, 5]
-board.layout[7][4] = nil
+# board.layout[7][6] = board.layout[7][4]
+# board.layout[7][6].current_position = [7, 6]
+# board.layout[7][4] = nil
 
-game.players[1].king[0].checked_positions = [[6, 4], [6, 5], [6, 6], [7, 4], [7, 5], [7, 6]]
+# game.players[1].king[0].checked_positions = [[6, 5], [6, 6], [6, 7], [7, 5], [7, 6], [7, 7]]
 game.play

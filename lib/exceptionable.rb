@@ -28,13 +28,9 @@ module Exceptionable
   end
 
   def pawn_next_moves(player)
-    result = opponent_pawns(player).filter_map do |pawn|
+    opponent_pawns(player).filter_map do |pawn|
       combine_paths(pawn.capture_moves, pawn, player)
     end.flatten(2).uniq
-
-    opponent_pawns(player).each { |pawn| pawn.continuous_movement = true if pawn.first_move == true }
-
-    result
   end
 
   def checked_moves(player)

@@ -39,22 +39,23 @@ module Configurable
     if valid_promotion?(active_piece, player, move_elements)
       promoted_piece = promotion(piece_stats, move_elements, player)
       validate_promotion(player, destination, piece_stats, active_piece, promoted_piece)
-    elsif valid_promotion?(active_piece, player, move_elements, negate: true)
+    elsif valid_promotion?(active_piece, player, move_elements, negate: false)
       change_state(player, destination, piece_stats, active_piece, nil)
       true
     else
-      invalid_promotion(active_piece, move_elements, piece_stats, player, destination)
+      invalid_promotion(active_piece, move_elements, player)
     end
   end
 
-  def valid_promotion?(active_piece, player, move_elements, negate: false)
-    condition = promotable?(active_piece) || (player.is_a?(Computer) ^ !move_elements[-2][-1].nil?)
-    negate ? !condition : condition
+  def valid_promotion?(active_piece, player, move_elements, negate: true)
+    promotable = negate ? promotable?(active_piece) : !promotable?(active_piece)
+    promotion_notation = negate ? !move_elements[-2][-1].nil? : move_elements[-2][-1].nil?
+    promotable && (player.is_a?(Computer) || promotion_notation)
   end
 
-  def invalid_promotion(active_piece, move_elements, _piece_stats, player)
+  def invalid_promotion(active_piece, move_elements, player)
     return if valid_promotion?(active_piece, player, move_elements)
-    return if valid_promotion?(active_piece, player, move_elements, negate: true)
+    return if valid_promotion?(active_piece, player, move_elements, negate: false)
 
     if promotable?(active_piece) && move_elements[-2][-1].nil?
       puts "\nThis should be a promotion move. Please try again.\n" if player.is_a?(Human)
@@ -105,6 +106,7 @@ module Configurable
     exchange_positions(player, destination)
     player.king[0].checked_positions = checked_moves(player)
     opponent(player).available_destinations = available_destinations(player) if opponent(player).is_a?(Computer)
+    opponent_pawns(player).each { |pawn| pawn.continuous_movement = true if pawn.first_move == true }
     standard_movements(piece, player, destination, promoted_piece)
   end
 
