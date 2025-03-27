@@ -8,14 +8,19 @@ require_relative 'parseable'
 require_relative 'traceable'
 require_relative 'exceptionable'
 require_relative 'configurable'
+require_relative 'conditionable'
 require_relative 'updatable'
 
 class Game
   include Parseable
   include Visualizable
   include Traceable
-  include Exceptionable
+  include Exceptionable::Castling
+  include Exceptionable::Promotion
+  include Exceptionable::EnPassant
+  include Exceptionable::Check
   include Configurable
+  include Conditionable
   include Updatable
   attr_reader :players, :board
 
@@ -51,16 +56,29 @@ class Game
   def play
     loop do
       players.each do |player|
-        if winner?(player)
-          puts "Player #{player_turn(opponent(player)) + 1} is the winner!"
-          return
-        end
+        warning(player)
+        break if winner?(player)
+
         parse_notation(player)
       end
+      break if players.any?(&method(:win_condition))
     end
   end
 
+  def warning(player)
+    return unless check_mate?(player, negate: false)
+
+    puts "Player #{player_turn(player) + 1}, you are being checked! Please make your move wisely."
+  end
+
   def winner?(player)
+    return unless win_condition(player)
+
+    puts "Player #{player_turn(opponent(player)) + 1} is the winner!"
+    true
+  end
+
+  def win_condition(player)
     check_mate?(player) || player.king[0].current_position.nil?
   end
 
@@ -88,22 +106,8 @@ class Game
       king, rook = player.valid_castling if player.is_a?(Computer)
 
       next if invalid_notation(move_elements, player)
-      break if process_notation(move_elements, player, king, rook)
+      break if process_notation(PIECE_STATS, move_elements, player, king, rook)
     end
-  end
-
-  def process_notation(move_elements, player, king, rook)
-    if valid_castling?(move_elements, player, king, rook)
-      true if castling_movement(PIECE_STATS, player, move_elements)
-    elsif valid_castling?(move_elements, player, king, rook, negate: false)
-      true if non_castling_movement(PIECE_STATS, player, move_elements)
-    end
-  end
-
-  def valid_castling?(move_elements, player, king, rook, negate: true)
-    move_elements_condition = move_elements && (negate ? !move_elements.last.nil? : move_elements.last.nil?)
-    castling_condition = negate ? castling?(king, rook, player) : !castling?(king, rook, player)
-    move_elements_condition || castling_condition
   end
 
   def prompt_notation(player_num, player)
@@ -127,7 +131,9 @@ class Game
   def invalid_notation(move_elements, player)
     return false unless move_elements.nil?
 
-    puts 'It not a valid chess notation. Please try again.' if player.is_a?(Human)
+    return unless player.is_a?(Human)
+
+    puts 'It not a valid chess notation. Please try again.'
     true
   end
 end
@@ -139,7 +145,7 @@ game = Game.new(board)
   board.layout[6][idx].current_position = nil
   board.layout[6][idx] = nil
 
-  unless [0, 4, 7].include?(idx)
+  unless [4].include?(idx)
     board.layout[7][idx].current_position = nil
     board.layout[7][idx] = nil
 
@@ -147,24 +153,24 @@ game = Game.new(board)
     board.layout[1][idx] = nil
   end
 
-  unless [0, 4, 7].include?(idx)
+  unless [3, 4, 7].include?(idx)
     board.layout[0][idx].current_position = nil
     board.layout[0][idx] = nil
   end
 end
 
-# # Move Player1's Queen to [6, 5] or Qf7
-# board.layout[4][6] = board.layout[1][4]
-# board.layout[4][6].current_position = [4, 6]
-# board.layout[1][4] = nil
+# Move Player1's Queen to [6, 5] or Qf7
+board.layout[4][6] = board.layout[1][4]
+board.layout[4][6].current_position = [4, 6]
+board.layout[1][4] = nil
 
-# board.layout[6][5] = board.layout[0][3]
-# board.layout[6][5].current_position = [6, 5]
-# board.layout[0][3] = nil
+board.layout[6][5] = board.layout[0][3]
+board.layout[6][5].current_position = [6, 5]
+board.layout[0][3] = nil
 
-# board.layout[7][6] = board.layout[7][4]
-# board.layout[7][6].current_position = [7, 6]
-# board.layout[7][4] = nil
+board.layout[7][6] = board.layout[7][4]
+board.layout[7][6].current_position = [7, 6]
+board.layout[7][4] = nil
 
-# game.players[1].king[0].checked_positions = [[6, 5], [6, 6], [6, 7], [7, 5], [7, 6], [7, 7]]
+game.players[1].king[0].checked_positions = [[6, 5], [6, 6], [6, 7], [7, 5], [7, 6], [7, 7]]
 game.play

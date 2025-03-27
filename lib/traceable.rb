@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module Traceable
-  def game_paths(piece, player, destination, check = false)
-    combine_paths(piece_moves(player, destination, piece), piece, player, destination, check).any?
+  def game_paths(piece, player, destination, check: false)
+    combine_paths(piece_moves(player, destination, piece), piece, player, destination, check: false).any?
   end
 
-  def combine_paths(moves, piece, player, destination = nil, check = false)
+  def combine_paths(moves, piece, player, destination = nil, check: false)
     return [] if moves.nil?
 
     all_locs = player.piece_locations + opponent(player).piece_locations
@@ -14,7 +14,7 @@ module Traceable
       path = build_path(piece.current_position, move, piece, destination)
       piece.continuous_movement = false if destination.nil? || pawn_blocked?(path[0...-1], all_locs, piece)
 
-      path if unblocked_path?(destination, path, all_locs, player, check) && double_step?(piece, destination)
+      path if unblocked_path?(destination, path, all_locs, player, check: false) && double_step?(piece, destination)
     end
   end
 
@@ -50,17 +50,17 @@ module Traceable
     !piece.continuous_movement || !valid?(location) || location == destination
   end
 
-  def unblocked_path?(destination, path, all_locations, player, check)
+  def unblocked_path?(destination, path, all_locations, player, check: false)
     return true unless destination
 
-    valid_path?(destination, path, all_locations) && checking_opponent?(player, destination, check)
+    valid_path?(destination, path, all_locations) && checking_opponent?(player, destination, check: false)
   end
 
   def valid_path?(destination, path, all_locations)
     (path.last == destination) && empty_path?(path[0...-1], all_locations)
   end
 
-  def checking_opponent?(player, destination, check)
+  def checking_opponent?(player, destination, check: false)
     check || empty_path?(player.piece_locations, [destination])
   end
 

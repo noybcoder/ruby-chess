@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 module Configurable
-  def active_pieces(pieces, player, destination, origin = nil, idx = nil)
-    pieces.select { |piece| active_piece_conditions(piece, player, destination, origin, idx) }
+  def process_notation(piece_stats, move_elements, player, king, rook)
+    if valid_castling?(move_elements, player, king, rook)
+      true if castling_movement(piece_stats, player, move_elements)
+    elsif valid_castling?(move_elements, player, king, rook, negate: false)
+      true if non_castling_movement(piece_stats, player, move_elements)
+    end
   end
 
   def non_castling_movement(piece_stats, player, move_elements = nil)
@@ -24,17 +28,6 @@ module Configurable
     end
   end
 
-  def invalid_moves(player, active_pieces)
-    return if active_pieces.length == 1
-
-    if active_pieces.length > 1
-      puts "\nThere are #{active_pieces.length} pieces that can make the move. Please specify." if player.is_a?(Human)
-    elsif player.is_a?(Human)
-      puts "\nIt is not a valid move. Please try again.\n"
-    end
-    false
-  end
-
   def define_promoted_piece(active_piece, move_elements, piece_stats, player, destination)
     if valid_promotion?(active_piece, player, move_elements)
       promoted_piece = promotion(piece_stats, move_elements, player)
@@ -45,40 +38,6 @@ module Configurable
     else
       invalid_promotion(active_piece, move_elements, player)
     end
-  end
-
-  def valid_promotion?(active_piece, player, move_elements, negate: true)
-    promotable = negate ? promotable?(active_piece) : !promotable?(active_piece)
-    promotion_notation = negate ? !move_elements[-2][-1].nil? : move_elements[-2][-1].nil?
-    promotable && (player.is_a?(Computer) || promotion_notation)
-  end
-
-  def invalid_promotion(active_piece, move_elements, player)
-    return if valid_promotion?(active_piece, player, move_elements)
-    return if valid_promotion?(active_piece, player, move_elements, negate: false)
-
-    if promotable?(active_piece) && move_elements[-2][-1].nil?
-      puts "\nThis should be a promotion move. Please try again.\n" if player.is_a?(Human)
-    elsif player.is_a?(Human)
-      puts "\nThis move is not qualified for a promotion. Please try again.\n"
-    end
-    false
-  end
-
-  def validate_promotion(player, destination, piece_stats, active_piece, promoted_piece)
-    if promoted_piece.is_a?(Pawn)
-      puts "\nIt not a valid chess notation. Please try again.\n" if player.is_a?(Human)
-      false
-    else
-      change_state(player, destination, piece_stats, active_piece, promoted_piece)
-      true
-    end
-  end
-
-  def active_piece_conditions(piece, player, destination, origin, idx)
-    return false if piece.current_position.nil?
-
-    game_paths(piece, player, destination) && (!origin || ([piece.current_position.values_at(*idx)] & [origin]).any?)
   end
 
   def castling_movement(piece_stats, player, move_elements)
