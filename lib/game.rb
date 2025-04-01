@@ -10,6 +10,7 @@ require_relative 'exceptionable'
 require_relative 'configurable'
 require_relative 'conditionable'
 require_relative 'updatable'
+require_relative 'serializable'
 
 class Game
   include Parseable
@@ -22,18 +23,18 @@ class Game
   include Configurable
   include Conditionable
   include Updatable
-  attr_reader :players, :board
+  include Serializable
+  attr_reader :player1, :player2, :board
 
-  def initialize(board)
-    @players = register_players
-    @board = board
+  def initialize
+    @player1 = Human.new
+    @player2 = register_opponent(@player1)
+    @board = Board.new
     set_up_board
   end
 
-  def register_players
-    player1 = Human.new
-    player2 = register_opponent(player1)
-    @players = [player1, player2]
+  def players
+    [@player1, @player2]
   end
 
   def register_opponent(player)
@@ -83,7 +84,7 @@ class Game
   end
 
   def set_up_board
-    @players.each do |player|
+    players.each do |player|
       player.retrieve_pieces.each do |piece|
         board.layout[piece.current_position[0]][piece.current_position[1]] = piece
       end
@@ -138,39 +139,41 @@ class Game
   end
 end
 
-board = Board.new
-game = Game.new(board)
 
-0.upto(7) do |idx|
-  board.layout[6][idx].current_position = nil
-  board.layout[6][idx] = nil
+game = Game.new
+p game.player1
+# p game.serialize_data(game.player1)
 
-  unless [4].include?(idx)
-    board.layout[7][idx].current_position = nil
-    board.layout[7][idx] = nil
+# 0.upto(7) do |idx|
+#   game.board.layout[6][idx].current_position = nil
+#   game.board.layout[6][idx] = nil
 
-    board.layout[1][idx].current_position = nil
-    board.layout[1][idx] = nil
-  end
+#   unless [4].include?(idx)
+#     game.board.layout[7][idx].current_position = nil
+#     game.board.layout[7][idx] = nil
 
-  unless [3, 4, 7].include?(idx)
-    board.layout[0][idx].current_position = nil
-    board.layout[0][idx] = nil
-  end
-end
+#     game.board.layout[1][idx].current_position = nil
+#     game.board.layout[1][idx] = nil
+#   end
 
-# Move Player1's Queen to [6, 5] or Qf7
-board.layout[4][6] = board.layout[1][4]
-board.layout[4][6].current_position = [4, 6]
-board.layout[1][4] = nil
+#   unless [3, 4, 7].include?(idx)
+#     game.board.layout[0][idx].current_position = nil
+#     game.board.layout[0][idx] = nil
+#   end
+# end
 
-board.layout[6][5] = board.layout[0][3]
-board.layout[6][5].current_position = [6, 5]
-board.layout[0][3] = nil
+# # Move Player1's Queen to [6, 5] or Qf7
+# game.board.layout[4][6] = game.board.layout[1][4]
+# game.board.layout[4][6].current_position = [4, 6]
+# game.board.layout[1][4] = nil
 
-board.layout[7][6] = board.layout[7][4]
-board.layout[7][6].current_position = [7, 6]
-board.layout[7][4] = nil
+# game.board.layout[6][5] = game.board.layout[0][3]
+# game.board.layout[6][5].current_position = [6, 5]
+# game.board.layout[0][3] = nil
 
-game.players[1].king[0].checked_positions = [[6, 5], [6, 6], [6, 7], [7, 5], [7, 6], [7, 7]]
-game.play
+# game.board.layout[7][6] = game.board.layout[7][4]
+# game.board.layout[7][6].current_position = [7, 6]
+# game.board.layout[7][4] = nil
+
+# game.players[1].king[0].checked_positions = [[6, 5], [6, 6], [6, 7], [7, 5], [7, 6], [7, 7]]
+# game.play

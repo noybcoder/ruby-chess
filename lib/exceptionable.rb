@@ -50,7 +50,7 @@ module Exceptionable
     end
 
     def opponent(player)
-      (@players - [player])[0]
+      (players - [player])[0]
     end
   end
 
