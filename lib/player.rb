@@ -21,6 +21,13 @@ class Player
   attr_accessor :king, :queen, :rook, :bishop, :knight, :pawn, :notation
 
   def initialize
+    initialize_pieces
+    Player.player_count += 1
+    handle_game_violations(PlayerLimitViolation, Player.player_count, PLAYER_LIMIT)
+    assign_chess_pieces
+  end
+
+  def initialize_pieces
     @king = []
     @queen = []
     @rook = []
@@ -28,15 +35,12 @@ class Player
     @knight = []
     @pawn = []
     @notation = Array.new(6)
-    self.class.player_count += 1
-    handle_game_violations(PlayerLimitViolation, self.class.player_count, PLAYER_LIMIT)
-    assign_chess_pieces
   end
 
   def assign_chess_pieces
     PIECE_STATS.each do |key, value|
       value[:rank_locations].length.times do |col|
-        count = self.class.player_count - 1
+        count = Player.player_count - 1
         col = value[:rank_locations][col]
         create_pieces(key, count, col)
       end

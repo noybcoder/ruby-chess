@@ -8,7 +8,6 @@ class Computer < Player
   include Configurable
   include Exceptionable
 
-  @player_count = 0
   attr_accessor :available_destinations
 
   def initialize

@@ -28,17 +28,38 @@ class Game
 
   def initialize
     @player1 = Human.new
-    @player2 = register_opponent(@player1)
+    @player2 = register_opponent
     @board = Board.new
     set_up_board
+  end
+
+  def serialize_progress
+    progress = organize_variables(self)
+    serialize(progress)
+  end
+
+  def save_progress
+    save_data(serialize_progress)
+  end
+
+  def load_progress
+    deserialize(self, load_data)
+  end
+
+  def access_progress(access = 'save')
+    loop do
+      puts "Would you like to #{access} your latest game progess? (y/n)"
+      choice = player1.make_choice
+      return choice if choice.match(/^y|n$/i)
+    end
   end
 
   def players
     [@player1, @player2]
   end
 
-  def register_opponent(player)
-    if opponent_choice(player) == 1
+  def register_opponent
+    if opponent_choice == 1
       Human.new
     else
       Computer.instance_variable_set(:@player_count, 1)
@@ -46,15 +67,16 @@ class Game
     end
   end
 
-  def opponent_choice(player)
+  def opponent_choice
     loop do
       puts 'Whom would you like to play against? Enter "1" for human or "2" for computer?'
-      choice = player.make_choice
+      choice = player1.make_choice
       return choice.to_i if choice.match(/^[12]$/)
     end
   end
 
   def play
+    load_progress if access_progress('load') == 'y'
     loop do
       players.each do |player|
         warning(player)
@@ -63,6 +85,8 @@ class Game
         parse_notation(player)
       end
       break if players.any?(&method(:win_condition))
+
+      save_progress if access_progress == 'y'
     end
   end
 
@@ -139,41 +163,5 @@ class Game
   end
 end
 
-
 game = Game.new
-p game.player1
-# p game.serialize_data(game.player1)
-
-# 0.upto(7) do |idx|
-#   game.board.layout[6][idx].current_position = nil
-#   game.board.layout[6][idx] = nil
-
-#   unless [4].include?(idx)
-#     game.board.layout[7][idx].current_position = nil
-#     game.board.layout[7][idx] = nil
-
-#     game.board.layout[1][idx].current_position = nil
-#     game.board.layout[1][idx] = nil
-#   end
-
-#   unless [3, 4, 7].include?(idx)
-#     game.board.layout[0][idx].current_position = nil
-#     game.board.layout[0][idx] = nil
-#   end
-# end
-
-# # Move Player1's Queen to [6, 5] or Qf7
-# game.board.layout[4][6] = game.board.layout[1][4]
-# game.board.layout[4][6].current_position = [4, 6]
-# game.board.layout[1][4] = nil
-
-# game.board.layout[6][5] = game.board.layout[0][3]
-# game.board.layout[6][5].current_position = [6, 5]
-# game.board.layout[0][3] = nil
-
-# game.board.layout[7][6] = game.board.layout[7][4]
-# game.board.layout[7][6].current_position = [7, 6]
-# game.board.layout[7][4] = nil
-
-# game.players[1].king[0].checked_positions = [[6, 5], [6, 6], [6, 7], [7, 5], [7, 6], [7, 7]]
-# game.play
+game.play
