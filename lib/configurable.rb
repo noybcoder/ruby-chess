@@ -53,6 +53,10 @@ module Configurable
     end
   end
 
+  def reset_pawn(player)
+    player.pawn.each { |pawn| pawn.continuous_movement = true if pawn.first_move == true }
+  end
+
   def make_castling_moves(king, rook, player, piece_stats)
     [king, rook].each do |piece|
       castling_position = piece.instance_variable_get("@#{king.castling_type}")
@@ -65,7 +69,7 @@ module Configurable
     exchange_positions(player, destination)
     player.king[0].checked_positions = checked_moves(player)
     opponent(player).available_destinations = available_destinations(player) if opponent(player).is_a?(Computer)
-    opponent_pawns(player).each { |pawn| pawn.continuous_movement = true if pawn.first_move == true }
+    reset_pawn(player)
     standard_movements(piece, player, destination, promoted_piece)
   end
 
@@ -80,7 +84,7 @@ module Configurable
   end
 
   def standard_movements(piece, player, destination, promoted_piece)
-    piece.double_step[1] = true if prove_en_passant(piece, player, destination)
+    piece.double_step[1] = true if prove_en_passant(piece, player, destination) && piece.first_move
     en_passant_target = en_passant_eligible(player)
     arrange_board(piece, destination, promoted_piece)
     en_passant_target.double_step[1] = false unless negate_en_passant(en_passant_target)

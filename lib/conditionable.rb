@@ -21,10 +21,11 @@ module Conditionable
 
   def validate_promotion(player, destination, piece_stats, active_piece, promoted_piece)
     if promoted_piece.is_a?(Pawn)
-      puts "\nIt not a valid chess notation. Please try again.\n" if player.is_a?(Human)
+      puts "\nIt not a valid piece for promotion. Please try again.\n" if player.is_a?(Human)
       false
     else
       change_state(player, destination, piece_stats, active_piece, promoted_piece)
+      active_piece.current_position = nil
       true
     end
   end
@@ -54,5 +55,27 @@ module Conditionable
 
   def active_pieces(pieces, player, destination, origin = nil, idx = nil)
     pieces.select { |piece| active_piece_conditions(piece, player, destination, origin, idx) }
+  end
+
+  def warning(player)
+    return unless check_mate?(player, negate: false)
+
+    puts "Player #{player_turn(player) + 1}, you are being checked! Please make your move wisely."
+  end
+
+  def winner?(player)
+    return unless win_condition(player)
+
+    victor = king_captured?(player) ? player : opponent(player)
+    puts "Player #{player_turn(victor) + 1} is the winner!"
+    true
+  end
+
+  def win_condition(player)
+    check_mate?(player) || king_captured?(player)
+  end
+
+  def king_captured?(player)
+    opponent(player).king[0].current_position.nil?
   end
 end

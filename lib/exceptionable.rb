@@ -70,13 +70,13 @@ module Exceptionable
       count = player_turn(player)
       promoted = promoted_piece[0].class
       promoted_piece_class = player.instance_variable_get("@#{promoted.to_s.downcase}")
-      promoted_piece_class << create_poromoted_piece(promoted, count)
+      promoted_piece_class << create_promoted_piece(promoted, count)
       promoted_piece_class[-1].unicode = piece_unicode_mapping[promoted.to_s.to_sym][count]
       promoted_piece_class[-1]
     end
 
-    def create_poromoted_piece(promoted, count)
-      promoted == Rook ? promoted.new(count + 1) : promoted.new
+    def create_promoted_piece(promoted, count)
+      [Rook, Pawn].include?(promoted) ? promoted.new(count + 1) : promoted.new
     end
 
     def promotable?(piece)
@@ -94,6 +94,7 @@ module Exceptionable
     end
 
     def prove_en_passant(piece, player, destination)
+      return false if piece.double_step[0].nil?
       en_passant_target(player, destination) && pawn_blocked?([piece.double_step[0]], [destination], piece)
     end
 

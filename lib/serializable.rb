@@ -39,10 +39,20 @@ module Serializable
 
   def deserialize(obj, save)
     obj.instance_variables.each do |var|
-      obj.instance_variable_set(var, save[var])
       decrement_variable_count(var)
+      var_1 = obj.instance_variable_get(var)
+      var_1.instance_variables.each do |var_2|
+        var_1.instance_variable_set(var_2, save[var].instance_variable_get(var_2))
+      end
     end
   end
+
+  # def deserialize(obj, save)
+  #   obj.instance_variables.each do |var|
+  #     obj.instance_variable_set(var, save[var])
+  #     decrement_variable_count(var)
+  #   end
+  # end
 
   def save_data(progress, file_name = 'save.json')
     File.open(file_name, 'wb') { |file| file.write(progress) }

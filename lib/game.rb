@@ -83,28 +83,13 @@ class Game
         break if winner?(player)
 
         parse_notation(player)
+        break if winner?(player)
+        p player.notation
       end
       break if players.any?(&method(:win_condition))
 
       save_progress if access_progress == 'y'
     end
-  end
-
-  def warning(player)
-    return unless check_mate?(player, negate: false)
-
-    puts "Player #{player_turn(player) + 1}, you are being checked! Please make your move wisely."
-  end
-
-  def winner?(player)
-    return unless win_condition(player)
-
-    puts "Player #{player_turn(opponent(player)) + 1} is the winner!"
-    true
-  end
-
-  def win_condition(player)
-    check_mate?(player) || player.king[0].current_position.nil?
   end
 
   def set_up_board
@@ -113,10 +98,6 @@ class Game
         board.layout[piece.current_position[0]][piece.current_position[1]] = piece
       end
     end
-  end
-
-  def endgame(player)
-    check_mate?(player)
   end
 
   def player_turn(player)
@@ -129,6 +110,7 @@ class Game
     loop do
       move_elements = prompt_notation(player_num, player) if player.is_a?(Human)
       king, rook = player.valid_castling if player.is_a?(Computer)
+      reset_pawn(player)
 
       next if invalid_notation(move_elements, player)
       break if process_notation(PIECE_STATS, move_elements, player, king, rook)
@@ -164,4 +146,14 @@ class Game
 end
 
 game = Game.new
+save = game.load_data
+
+# game.instance_variables.each do |var|
+#   game.decrement_variable_count(var)
+#   var_1 = game.instance_variable_get(var)
+#   var_1.instance_variables.each do |var_2|
+#     var_1.instance_variable_set(var_2, save[var].instance_variable_get(var_2))
+#   end
+# end
+
 game.play
