@@ -84,7 +84,6 @@ class Game
 
         parse_notation(player)
         break if winner?(player)
-        p player.notation
       end
       break if players.any?(&method(:win_condition))
 

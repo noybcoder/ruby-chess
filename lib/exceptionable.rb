@@ -94,7 +94,7 @@ module Exceptionable
     end
 
     def prove_en_passant(piece, player, destination)
-      return false if piece.double_step[0].nil?
+      return false if piece.double_step.nil?
       en_passant_target(player, destination) && pawn_blocked?([piece.double_step[0]], [destination], piece)
     end
 

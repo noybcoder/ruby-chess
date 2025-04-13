@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'oj'
-
 module Serializable
   def gather_variables(obj)
     obj.class.instance_variables + obj.instance_variables
@@ -16,7 +14,7 @@ module Serializable
   end
 
   def serialize(hashed_obj)
-    Oj.dump(hashed_obj, mode: :object)
+    Marshal.dump(hashed_obj)
   end
 
   def class_name(instance)
@@ -38,27 +36,20 @@ module Serializable
   end
 
   def deserialize(obj, save)
-    obj.instance_variables.each do |var|
-      decrement_variable_count(var)
-      var_1 = obj.instance_variable_get(var)
-      var_1.instance_variables.each do |var_2|
-        var_1.instance_variable_set(var_2, save[var].instance_variable_get(var_2))
+    obj.instance_variables.each do |component|
+      decrement_variable_count(component)
+      piece = obj.instance_variable_get(component)
+      piece.instance_variables.each do |attribute|
+        piece.instance_variable_set(attribute, save[component].instance_variable_get(attribute))
       end
     end
   end
 
-  # def deserialize(obj, save)
-  #   obj.instance_variables.each do |var|
-  #     obj.instance_variable_set(var, save[var])
-  #     decrement_variable_count(var)
-  #   end
-  # end
-
-  def save_data(progress, file_name = 'save.json')
+  def save_data(progress, file_name = 'save.marshal')
     File.open(file_name, 'wb') { |file| file.write(progress) }
   end
 
-  def load_data(file_name = 'save.json')
-    Oj.load(File.read(file_name, mode: 'rb'))
+  def load_data(file_name = 'save.marshal')
+    Marshal.load(File.read(file_name, mode: 'rb'))
   end
 end
