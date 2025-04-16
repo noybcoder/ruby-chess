@@ -48,7 +48,7 @@ class Game
 
   def access_progress(access = 'save')
     loop do
-      puts "Would you like to #{access} your latest game progess? (y/n)"
+      puts "\nWould you like to #{access} your latest game progess? (y/n)"
       choice = player1.make_choice
       return choice if choice.match(/^y|n$/i)
     end
@@ -145,14 +145,20 @@ class Game
 end
 
 game = Game.new
-save = game.load_data
 
-# game.instance_variables.each do |var|
-#   game.decrement_variable_count(var)
-#   var_1 = game.instance_variable_get(var)
-#   var_1.instance_variables.each do |var_2|
-#     var_1.instance_variable_set(var_2, save[var].instance_variable_get(var_2))
+# 0.upto(7) do |idx|
+#   # game.board.layout[1][idx].current_position = nil
+#   # game.board.layout[1][idx] = nil
+
+#   game.board.layout[6][idx].current_position = nil
+#   game.board.layout[6][idx] = nil
+
+
+#   unless [0, 4, 7].include?(idx)
+#     game.board.layout[7][idx].current_position = nil
+#     game.board.layout[7][idx] = nil
 #   end
+
 # end
 
 game.play
