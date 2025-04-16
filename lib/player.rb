@@ -26,8 +26,7 @@ class Player
   attr_accessor :king, :queen, :rook, :bishop, :knight, :pawn, :notation
 
   # Public: Initializes a new player with all chess pieces in starting positions
-  #
-  # @return an instance of Player
+  # @return [Player] an instance of Player
   def initialize
     initialize_pieces   # Set up empty piece collections
     Player.player_count += 1  # Increment player counter
@@ -37,8 +36,7 @@ class Player
   end
 
   # Public: Initializes empty arrays for all piece types and notation
-  #
-  # @return nil
+  # @return [void]
   def initialize_pieces
     @king = []     # Array to store king(s)
     @queen = []    # Array to store queens
@@ -50,8 +48,7 @@ class Player
   end
 
   # Public: Creates and positions all pieces according to standard chess setup
-  #
-  # @return nil
+  # @return [void]
   def assign_chess_pieces
     PIECE_STATS.each do |key, value|
       # Create specified number of pieces for each type
@@ -67,7 +64,7 @@ class Player
   # @param key [Symbol] The piece type (:King, :Queen, etc.)
   # @param count [Integer] Player index (0 or 1)
   # @param col [Integer] File (column) position
-  # @return nil
+  # @return [void]
   def create_pieces(key, count, col)
     # Special initialization for Pawns, Rooks, and Kings
     piece = Object.const_get(key).new(*([count + 1] if %i[Pawn Rook King].include?(key)))
@@ -88,7 +85,7 @@ class Player
   # @param count [Integer] Player index
   # @param row [Integer] Rank position
   # @param col [Integer] File position
-  # @return nil
+  # @return [void]
   def fill_piece_info(piece, key, count, row, col)
     # Set unicode symbol (color based on player)
     piece.unicode = piece_unicode_mapping[key][count]

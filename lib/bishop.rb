@@ -5,8 +5,7 @@ require_relative 'chess'
 # The Bishop class represents a bishop chess piece, inheriting from the base Chess class.
 class Bishop < Chess
   # Public: Initializes a new Bishop with its characteristic diagonal movement pattern.
-  #
-  # @return an instance of Bishop
+  # @return [Bishop] an instance of Bishop
   def initialize
     super  # Calls the parent Chess class's initialize method
 

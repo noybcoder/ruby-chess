@@ -20,8 +20,7 @@ class Board
   BOARD_LIMIT = 1        # Maximum allowed board instances
 
   # Public: Initializes a new chess board with default configuration
-  #
-  # @return an instance of Board
+  # @return [Board] an instance of Board
   def initialize
     # ANSI color codes for chess board squares (dark and light)
     @background_colors = ["\e[48;2;222;184;135m", "\e[48;2;255;248;220m"]
@@ -39,7 +38,8 @@ class Board
     handle_game_violations(BoardLimitViolation, self.class.board_count, BOARD_LIMIT)
   end
 
-  # Displays the current board state with coordinates and pieces
+  # Public: Displays the current board state with coordinates and pieces
+  # @return [void]
   def display_board
     # Print top files (column letters)
     puts "   #{files.join('   ')}"

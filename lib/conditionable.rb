@@ -5,7 +5,7 @@
 # and win conditions.
 module Conditionable
   # Public: Checks if a promotion move is valid
-  # @param active_piece [Piece] The piece being moved
+  # @param active_piece [Chess] The piece being moved
   # @param player [Player] The player making the move
   # @param move_elements [Array] Parsed components of the move notation
   # @param negate [Boolean] Whether to negate the promotion check
@@ -17,6 +17,9 @@ module Conditionable
   end
 
   # Public: Validates promotion move and provides user feedback if invalid
+  # @param active_piece [Chess] The piece being moved
+  # @param move_elements [Array] Parsed components of the move notation
+  # @param player [Player] The player making the move
   # @return [Boolean] False if promotion is invalid, nil otherwise
   def invalid_promotion(active_piece, move_elements, player)
     return if valid_promotion?(active_piece, player, move_elements)
@@ -31,6 +34,11 @@ module Conditionable
   end
 
   # Public: Validates and processes a promotion move
+  # @param player [Player] The player making the move
+  # @param destination [Array<Integer, Integer>] The position in which a selected piece is moved to
+  # @param piece_stats [Hash] A hash containing chess piece statistics
+  # @param active_piece [Chess] The piece being moved
+  # @param promoted_piece [Chess] The piece that is used to replace the pawn in case of a promotion
   # @return [Boolean] True if promotion is successful
   def validate_promotion(player, destination, piece_stats, active_piece, promoted_piece)
     if promoted_piece.is_a?(Pawn)
@@ -44,6 +52,8 @@ module Conditionable
   end
 
   # Public: Checks for ambiguous moves and provides user feedback
+  # @param player [Player] The player making the move
+  # @param active_pieces [Array<Chess>] Array of pieces that satisfy some conditions
   # @return [Boolean] False if moves are invalid, nil otherwise
   def invalid_moves(player, active_pieces)
     return if active_pieces.length == 1
@@ -57,6 +67,10 @@ module Conditionable
   end
 
   # Public: Validates castling conditions
+  # @param move_elements [Array] Parsed components of the move notation
+  # @param player [Player] The player making the move
+  # @param king [King] The king piece
+  # @param rook [Rook] The rook piece
   # @param negate [Boolean] Whether to negate the castling check
   # @return [Boolean] True if castling conditions are met
   def valid_castling?(move_elements, player, king, rook, negate: true)
@@ -66,6 +80,11 @@ module Conditionable
   end
 
   # Public: Checks conditions for an active piece that can make a move
+  # @param piece [Chess] The piece being moved
+  # @param player [Player] The player making the move
+  # @param destination [Array<Integer, Integer>] The position in which a selected piece is moved to
+  # @param origin [Array<Integer>] The rank, file or both in which the piece starts off with
+  # @param idx [Integer] An integer to determine if rank or file should be selected if there is more one active piece
   # @return [Boolean] True if piece meets move conditions
   def active_piece_conditions(piece, player, destination, origin, idx)
     return false if piece.current_position.nil?
@@ -74,13 +93,19 @@ module Conditionable
   end
 
   # Public: Selects pieces that can legally move to destination
+  # @param piece [Chess] The piece being moved
+  # @param player [Player] The player making the move
+  # @param destination [Array<Integer, Integer>] The position in which a selected piece is moved to
+  # @param origin [Array<Integer>] The rank, file or both in which the piece starts off with
+  # @param idx [Integer] An integer to determine if rank or file should be selected if there is more one active piece
   # @return [Array] Array of pieces meeting move conditions
   def active_pieces(pieces, player, destination, origin = nil, idx = nil)
     pieces.select { |piece| active_piece_conditions(piece, player, destination, origin, idx) }
   end
 
   # Public: Warns player when in check
-  # @return nil
+  # @param player [Player] The player making the move
+  # @return [void]
   def warning(player)
     return unless check_mate?(player, negate: false)
 
@@ -88,6 +113,7 @@ module Conditionable
   end
 
   # Public: Checks and announces winner
+  # @param player [Player] The player making the move
   # @return [Boolean] True if there is a winner
   def winner?(player)
     return unless win_condition(player)
@@ -99,12 +125,14 @@ module Conditionable
   end
 
   # Public: Checks if win conditions are met
+  # @param player [Player] The player making the move
   # @return [Boolean] True if checkmate or king is captured
   def win_condition(player)
     check_mate?(player) || king_captured?(player)
   end
 
   # Public: Checks if player's king has been captured
+  # @param player [Player] The player making the move
   # @return [Boolean] True if king has no position (captured)
   def king_captured?(player)
     opponent(player).king[0].current_position.nil?

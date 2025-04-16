@@ -18,8 +18,7 @@ class Chess
               :queen_castling  # Castling move vector for queen-side
 
   # Public: Initializes a new chess piece with default values
-  #
-  # @return an instance of Chess
+  # @return [Chess] an instance of Chess
   def initialize
     @unicode = nil             # Must be set by subclass
     @possible_moves = []       # Must be populated by subclass

@@ -5,7 +5,7 @@ require_relative 'chess'
 # The Knight class represents a knight chess piece, inheriting from the base Chess class.
 class Knight < Chess
   # Public: Initializes a new Knight with its characteristic L-shaped movement pattern.
-  # @return an instance of Knight
+  # @return [Knight] an instance of Knight
   def initialize
     super  # Calls the parent Chess class's initialize method
 

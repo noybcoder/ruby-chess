@@ -3,21 +3,21 @@
 # The Traceable module provides functionality for tracing and validating movement paths for chess pieces.
 module Traceable
   # Public: Determines if valid paths exist for a piece to reach a destination
-  # @param piece [Piece] The chess piece to move
+  # @param piece [Chess] The chess piece to move
   # @param player [Player] The player making the move
   # @param destination [Array] Target coordinates [rank, file]
-  # @param check [Boolean] Whether to check for opponent's king safety
+  # @param check [Boolean] Whether to perform the check
   # @return [Boolean] True if valid paths exist
   def game_paths(piece, player, destination, check: false)
     combine_paths(piece_moves(player, destination, piece), piece, player, destination, check: false).any?
   end
 
   # Public: Combines and filters all possible paths for a piece
-  # @param moves [Array] Possible movement vectors for the piece
-  # @param piece [Piece] The chess piece to move
+  # @param moves [Array<Array<Integer, Integer>>] Possible movement vectors for the piece
+  # @param piece [Chess] The chess piece to move
   # @param player [Player] The player making the move
   # @param destination [Array, nil] Target coordinates [rank, file] (optional)
-  # @param check [Boolean] Whether to check for opponent's king safety
+  # @param check [Boolean] Whether to perform the check
   # @return [Array] Valid paths that meet all movement conditions
   def combine_paths(moves, piece, player, destination = nil, check: false)
     return [] if moves.nil?
@@ -34,16 +34,16 @@ module Traceable
   end
 
   # Public: Checks if a path is blocked for a pawn
-  # @param path [Array] The path to check
-  # @param locations [Array] All occupied board locations
-  # @param piece [Piece] The chess piece (specifically checking for pawns)
+  # @param path [Array<Array<Integer, Integer>>] The path to check
+  # @param locations [Array<Array<Integer, Integer>>] All occupied board locations
+  # @param piece [Chess] The chess piece (specifically checking for pawns)
   # @return [Boolean] True if path is blocked and piece is a pawn
   def pawn_blocked?(path, locations, piece)
     !empty_path?(path, locations) && piece.is_a?(Pawn)
   end
 
   # Public: Validates pawn double-step move (first move only)
-  # @param piece [Piece] The chess piece
+  # @param piece [Chess] The chess piece
   # @param destination [Array, nil] Target coordinates [rank, file]
   # @return [Boolean] True if valid double step or not a pawn
   def double_step?(piece, destination)
@@ -55,7 +55,7 @@ module Traceable
   # Public: Determines appropriate moves based on capture context
   # @param player [Player] The player making the move
   # @param destination [Array] Target coordinates [rank, file]
-  # @param piece [Piece] The chess piece
+  # @param piece [Chess] The chess piece
   # @return [Array] Either capture moves or regular possible moves
   def piece_moves(player, destination, piece)
     capture_moves?(player, destination, piece) ? piece.capture_moves : piece.possible_moves
@@ -64,7 +64,7 @@ module Traceable
   # Public: Checks if the move should use capture-specific movement rules
   # @param player [Player] The player making the move
   # @param destination [Array] Target coordinates [rank, file]
-  # @param piece [Piece] The chess piece
+  # @param piece [Chess] The chess piece
   # @return [Boolean] True if this is a capture move or en passant
   def capture_moves?(player, destination, piece)
     pawn_blocked?(opponent(player).piece_locations, [destination], piece) || en_passant?(player, destination)
@@ -73,7 +73,7 @@ module Traceable
   # Public: Recursively builds a movement path from current position to destination
   # @param current [Array] Starting coordinates [rank, file]
   # @param move [Array] Movement vector [rank_delta, file_delta]
-  # @param piece [Piece] The chess piece
+  # @param piece [Chess] The chess piece
   # @param destination [Array, nil] Target coordinates [rank, file]
   # @param path [Array] Accumulator for building the path
   # @return [Array] The complete movement path
@@ -88,7 +88,7 @@ module Traceable
   end
 
   # Public: Checks if path building should terminate
-  # @param piece [Piece] The chess piece
+  # @param piece [Chess] The chess piece
   # @param location [Array] Current coordinates being checked
   # @param destination [Array, nil] Target coordinates [rank, file]
   # @return [Boolean] True if path building should stop
@@ -101,7 +101,7 @@ module Traceable
   # @param path [Array] The path to validate
   # @param all_locations [Array] All occupied board locations
   # @param player [Player] The player making the move
-  # @param check [Boolean] Whether to check for opponent's king safety
+  # @param check [Boolean] Whether to perform the check
   # @return [Boolean] True if path is valid
   def unblocked_path?(destination, path, all_locations, player, check: false)
     return true unless destination

@@ -6,7 +6,7 @@ require_relative 'chess'
 # capabilities of both a Rook and Bishop. It inherits from the base Chess class.
 class Queen < Chess
   # Public: Initializes a new Queen with its combined movement capabilities.
-  # @return an instance of Queen
+  # @return [Queen] an instance of Queen
   def initialize
     super  # Calls the parent Chess class's initialize method
 

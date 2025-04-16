@@ -6,7 +6,7 @@ require_relative 'chess'
 class Pawn < Chess
   # Initializes a new Pawn with player-specific movement rules
   # @param player_number [Integer] 1 for player 1 (usually white), 2 for player 2 (usually black)
-  # @return an instance of Pawn
+  # @return [Pawn] an instance of Pawn
   def initialize(player_number)
     super()  # Initialize base Chess class attributes
 

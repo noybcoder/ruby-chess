@@ -6,7 +6,7 @@ require_relative 'chess'
 class Rook < Chess
   # Initializes a new Rook with player-specific castling positions
   # @param player_number [Integer] 1 for player 1 (typically white), 2 for player 2 (typically black)
-  # @return an instance of Rook
+  # @return [Rook] an instance of Rook
   def initialize(player_number)
     super()  # Initialize base Chess class attributes
 

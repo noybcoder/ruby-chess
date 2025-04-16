@@ -14,8 +14,7 @@ class Computer < Player
   attr_accessor :available_destinations
 
   # Public: Initializes a new computer player with empty destination options
-  #
-  # @return an instance of Computer
+  # @return [Computer] an instance of Computer
   def initialize
     super()  # Initialize parent Player class
     @available_destinations = nil  # Will store possible move targets

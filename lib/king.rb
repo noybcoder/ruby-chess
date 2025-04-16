@@ -6,7 +6,7 @@ require_relative 'chess'
 class King < Chess
   # Public: Initializes a new King piece with player-specific settings
   # @param player_number [Integer] 1 for player 1 (usually white), 2 for player 2 (usually black)
-  # @return an instance of King
+  # @return [King] an instance of King
   def initialize(player_number)
     super()  # Calls parent Chess class's initialize method
 

@@ -4,6 +4,11 @@
 # for chess, including normal moves, castling, promotions, and board state management.
 module Configurable
   # Public: Processes chess notation and routes to appropriate move handler
+  # @param piece_stats [Hash] A hash containing chess piece statistics
+  # @param move_elements [Array] Split components of the move notation
+  # @param player [Player] The player making the move
+  # @param king [King] The king piece
+  # @param rook [Rook] The rook piece
   # @return [Boolean] True if move was successfully processed
   def process_notation(piece_stats, move_elements, player, king, rook)
     if valid_castling?(move_elements, player, king, rook)
@@ -14,6 +19,9 @@ module Configurable
   end
 
   # Public: Handles standard (non-castling) chess moves
+  # @param piece_stats [Hash] A hash containing chess piece statistics
+  # @param player [Player] The player making the move
+  # @param move_elements [Array] Split components of the move notation
   # @return [Boolean] True if move was successfully executed
   def non_castling_movement(piece_stats, player, move_elements = nil)
     # Get relevant pieces based on player type (human or computer)
@@ -32,6 +40,11 @@ module Configurable
   end
 
   # Public: Executes standard chess moves after validation
+  # @param active_pieces [Array<Chess>] Array of pieces that satisfy some conditions
+  # @param move_elements [Array] Split components of the move notation
+  # @param piece_stats [Hash] A hash containing chess piece statistics
+  # @param player [Player] The player making the move
+  # @param destination [Array<Integer, Integer>] The position in which a selected piece is moved to
   # @return [Boolean] True if move was successfully made
   def make_normal_moves(active_pieces, move_elements, piece_stats, player, destination)
     if active_pieces.length == 1
@@ -44,6 +57,11 @@ module Configurable
   end
 
   # Public: Handles promotion logic for pawn moves
+  # @param active_piece [Chess] The piece being moved
+  # @param move_elements [Array] Split components of the move notation
+  # @param piece_stats [Hash] A hash containing chess piece statistics
+  # @param player [Player] The player making the move
+  # @param destination [Array<Integer, Integer>] The position in which a selected piece is moved to
   # @return [Boolean] True if promotion was successfully processed
   def define_promoted_piece(active_piece, move_elements, piece_stats, player, destination)
     if valid_promotion?(active_piece, player, move_elements)
@@ -58,6 +76,9 @@ module Configurable
   end
 
   # Public: Handles castling moves
+  # @param piece_stats [Hash] A hash containing chess piece statistics
+  # @param player [Player] The player making the move
+  # @param move_elements [Array] Split components of the move notation
   # @return [Boolean] True if castling was successfully executed
   def castling_movement(piece_stats, player, move_elements)
     # Get castling pieces - from computer AI or human input
@@ -76,13 +97,18 @@ module Configurable
   end
 
   # Public: Resets pawn movement flags after first move
-  # @return nil
+  # @param player [Player] The player making the move
+  # @return [void]
   def reset_pawn(player)
     player.pawn.each { |pawn| pawn.continuous_movement = true if pawn.first_move == true }
   end
 
   # Public: Executes the actual castling movement on the board
-  # @return nil
+  # @param king [King] The king piece
+  # @param rook [Rook] The rook piece
+  # @param player [Player] The player making the move
+  # @param piece_stats [Hash] A hash containing chess piece statistics
+  # @return [void]
   def make_castling_moves(king, rook, player, piece_stats)
     [king, rook].each do |piece|
       # Get target position from castling type (king-side or queen-side)
@@ -92,7 +118,12 @@ module Configurable
   end
 
   # Public: Updates game state after a move is made
-  # @return nil
+  # @param player [Player] The player making the move
+  # @param destination [Array<Integer, Integer>] The position in which a selected piece is moved to
+  # @param piece_stats [Hash] A hash containing chess piece statistics
+  # @param piece [Chess] The piece being moved
+  # @param promoted_piece [Chess] The piece that is used to replace the pawn in case of a promotion
+  # @return [void]
   def change_state(player, destination, piece_stats, piece, promoted_piece = nil)
     update_non_castling_notation(player, piece_stats, piece, destination, promoted_piece)  # Update move notation
     exchange_positions(player, destination)  # Handle piece position changes
@@ -104,7 +135,9 @@ module Configurable
   end
 
   # Public: Handles piece position exchanges during moves
-  # @return nil
+  # @param player [Player] The player making the move
+  # @param destination [Array<Integer, Integer>] The position in which a selected piece is moved to
+  # @return [void]
   def exchange_positions(player, destination)
     opp_loc = finalize_destination(player, destination)  # Get final destination (handles en passant)
 
@@ -116,13 +149,19 @@ module Configurable
   end
 
   # Public: Determines final destination accounting for en passant
+  # @param player [Player] The player making the move
+  # @param destination [Array<Integer, Integer>] The position in which a selected piece is moved to
   # @return [Array] Final [rank, file] destination
   def finalize_destination(player, destination)
     en_passant?(player, destination) ? en_passant_opponent(player, destination).current_position : destination
   end
 
   # Public: Completes standard move processing
-  # @return nil
+  # @param piece [Chess] The piece being moved
+  # @param player [Player] The player making the move
+  # @param destination [Array<Integer, Integer>] The position in which a selected piece is moved to
+  # @param promoted_piece [Chess] The piece that is used to replace the pawn in case of a promotion
+  # @return [void]
   def standard_movements(piece, player, destination, promoted_piece)
     # Handle en passant flag for pawns
     piece.double_step[1] = true if prove_en_passant(piece, player, destination) && piece.first_move
@@ -135,7 +174,10 @@ module Configurable
   end
 
   # Public: Updates the board with the moved piece
-  # @return nil
+  # @param piece [Chess] The piece being moved
+  # @param destination [Array<Integer, Integer>] The position in which a selected piece is moved to
+  # @param promoted_piece [Chess] The piece that is used to replace the pawn in case of a promotion
+  # @return [void]
   def arrange_board(piece, destination, promoted_piece)
     target = promoted_piece.nil? ? piece : promoted_piece  # Use promoted piece if applicable
 
@@ -148,6 +190,7 @@ module Configurable
   end
 
   # Public: Gets all available destination squares for a player
+  # @param player [Player] The player making the move
   # @return [Array] Array of [rank, file] positions
   def available_destinations(player)
     board.layout.each_with_index.flat_map do |rank, rank_idx|
@@ -160,7 +203,8 @@ module Configurable
   end
 
   # Public: Resets move flags for pieces with special first move rules
-  # @return nil
+  # @param player [Player] The player making the move
+  # @return [void]
   def reset_piece(target)
     target.reset_moves if [Pawn, King, Rook].any? { |piece| target.is_a?(piece) }
   end
