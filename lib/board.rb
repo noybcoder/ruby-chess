@@ -5,14 +5,14 @@ require_relative 'player'
 
 # The Board class represents a chess board.
 class Board
-  include CustomErrors  # Includes custom error handling functionality
+  include CustomErrors # Includes custom error handling functionality
   attr_reader :ranks, :files  # Board coordinates (1-8 and a-h)
   attr_accessor :layout       # 2D array representing piece positions
 
   # Class-level attributes and methods
   class << self
-    attr_accessor :board_count  # Tracks number of board instances
-    attr_reader :background_colors, :color_offset  # Display colors
+    attr_accessor :board_count # Tracks number of board instances
+    attr_reader :background_colors, :color_offset # Display colors
   end
 
   # Class variables initialization
@@ -24,7 +24,7 @@ class Board
   def initialize
     # ANSI color codes for chess board squares (dark and light)
     @background_colors = ["\e[48;2;222;184;135m", "\e[48;2;255;248;220m"]
-    @color_offset = "\e[0m"  # ANSI reset code
+    @color_offset = "\e[0m" # ANSI reset code
 
     # Board coordinate systems
     @ranks = Array(1..8)     # Vertical ranks (1-8)
@@ -46,8 +46,8 @@ class Board
 
     # Print each rank (row) from top to bottom (8 to 1)
     ranks.reverse.each do |rank|
-      row = board_content(rank)  # Get formatted row content
-      puts "#{rank} #{row.join} #{rank}"  # Print row with rank numbers
+      row = board_content(rank) # Get formatted row content
+      puts "#{rank} #{row.join} #{rank}" # Print row with rank numbers
     end
 
     # Print bottom files (column letters)

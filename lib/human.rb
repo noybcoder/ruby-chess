@@ -7,6 +7,6 @@ class Human < Player
   # Gets the player's move choice from standard input
   # @return [String] The raw input string representing the player's move
   def make_choice
-    gets.chomp  # Reads from standard input and removes trailing newline
+    gets.chomp # Reads from standard input and removes trailing newline
   end
 end

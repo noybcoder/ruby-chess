@@ -28,7 +28,7 @@ class Game
   include Updatable          # Game state updates
   include Serializable       # Save/load functionality
 
-  attr_reader :player1, :player2, :board  # Access to game components
+  attr_reader :player1, :player2, :board # Access to game components
 
   # Public: Initializes a new game with players and board
   # @return [Game] an instance of Game
@@ -49,13 +49,13 @@ class Game
   # Public: Saves game state to file
   # @return [void]
   def save_progress
-    save_data(serialize_progress)   # Write to save file
+    save_data(serialize_progress) # Write to save file
   end
 
   # Public: Loads game state from file
   # @return [void]
   def load_progress
-    deserialize(self, load_data)  # Restore game state
+    deserialize(self, load_data) # Restore game state
   end
 
   # Public: Prompts player about save/load operation
@@ -65,7 +65,7 @@ class Game
     loop do
       puts "\nWould you like to #{access} your latest game progress? (y/n)"
       choice = player1.make_choice
-      return choice if choice.match(/^y|n$/i)  # Validate input
+      return choice if choice.match(/^y|n$/i) # Validate input
     end
   end
 
@@ -79,10 +79,10 @@ class Game
   # @return [Player] either a Human or Computer opponent
   def register_opponent
     if opponent_choice == 1
-      Human.new  # Human opponent
+      Human.new # Human opponent
     else
       Computer.instance_variable_set(:@player_count, 1)
-      Computer.new  # Computer opponent
+      Computer.new # Computer opponent
     end
   end
 
@@ -92,26 +92,26 @@ class Game
     loop do
       puts 'Whom would you like to play against? Enter "1" for human or "2" for computer?'
       choice = player1.make_choice
-      return choice.to_i if choice.match(/^[12]$/)  # Validate input
+      return choice.to_i if choice.match(/^[12]$/) # Validate input
     end
   end
 
   # Public: Main game loop
   # @return [void]
   def play
-    load_progress if access_progress('load') == 'y'  # Load game if requested
+    load_progress if access_progress('load') == 'y' # Load game if requested
 
     loop do
       players.each do |player|
-        warning(player)  # Show check warning if applicable
-        break if winner?(player)  # Exit if game over
+        warning(player) # Show check warning if applicable
+        break if winner?(player) # Exit if game over
 
-        parse_notation(player)  # Process player move
-        break if winner?(player)  # Exit if game over
+        parse_notation(player) # Process player move
+        break if winner?(player) # Exit if game over
       end
-      break if players.any?(&method(:win_condition))  # Exit if game over
+      break if players.any?(&method(:win_condition)) # Exit if game over
 
-      save_progress if access_progress == 'y'  # Save if requested
+      save_progress if access_progress == 'y' # Save if requested
     end
   end
 
@@ -137,16 +137,16 @@ class Game
   # @param player [Player] the current player
   # @return [void]
   def parse_notation(player)
-    player_num = player_turn(player) + 1  # Human-readable player number
+    player_num = player_turn(player) + 1 # Human-readable player number
 
     loop do
       # Get move from human or computer
       move_elements = prompt_notation(player_num, player) if player.is_a?(Human)
       king, rook = player.valid_castling if player.is_a?(Computer)
-      reset_pawn(player)  # Reset pawn movement flags
+      reset_pawn(player) # Reset pawn movement flags
 
-      next if invalid_notation(move_elements, player)  # Skip if invalid move
-      break if process_notation(PIECE_STATS, move_elements, player, king, rook)  # Exit if valid move processed
+      next if invalid_notation(move_elements, player) # Skip if invalid move
+      break if process_notation(PIECE_STATS, move_elements, player, king, rook) # Exit if valid move processed
     end
   end
 
@@ -155,9 +155,9 @@ class Game
   # @param player [Player] the current player
   # @return [Array<String>] parsed move elements or nil
   def prompt_notation(player_num, player)
-    board.display_board  # Show current board state
+    board.display_board # Show current board state
     puts "\nPlayer #{player_num}, please enter your move:"
-    retrieve_notation(player)  # Get and parse move input
+    retrieve_notation(player) # Get and parse move input
   end
 
   # Public: Announces computer's turn
@@ -195,4 +195,15 @@ class Game
 end
 
 game = Game.new
+
+0.upto(7) do |idx|
+  game.board.layout[6][idx].current_position = nil
+  game.board.layout[6][idx] = nil
+
+  unless[0, 4, 7].include?(idx)
+    game.board.layout[7][idx].current_position = nil
+    game.board.layout[7][idx] = nil
+  end
+end
+
 game.play

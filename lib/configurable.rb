@@ -48,11 +48,11 @@ module Configurable
   # @return [Boolean] True if move was successfully made
   def make_normal_moves(active_pieces, move_elements, piece_stats, player, destination)
     if active_pieces.length == 1
-      introduce_computer if player.is_a?(Computer)  # Display computer move info
+      introduce_computer if player.is_a?(Computer) # Display computer move info
       active_piece = active_pieces[0] if active_pieces.length == 1
       define_promoted_piece(active_piece, move_elements, piece_stats, player, destination)
     else
-      invalid_moves(player, active_pieces)  # Handle ambiguous/invalid moves
+      invalid_moves(player, active_pieces) # Handle ambiguous/invalid moves
     end
   end
 
@@ -68,10 +68,10 @@ module Configurable
       promoted_piece = promotion(piece_stats, move_elements, player)
       validate_promotion(player, destination, piece_stats, active_piece, promoted_piece)
     elsif valid_promotion?(active_piece, player, move_elements, negate: false)
-      change_state(player, destination, piece_stats, active_piece, nil)  # Normal move
+      change_state(player, destination, piece_stats, active_piece, nil) # Normal move
       true
     else
-      invalid_promotion(active_piece, move_elements, player)  # Invalid promotion
+      invalid_promotion(active_piece, move_elements, player) # Invalid promotion
     end
   end
 
@@ -85,9 +85,9 @@ module Configurable
     king, rook, notation = player.is_a?(Computer) ? player.valid_castling : parse_castling(move_elements, player)
 
     if castling?(king, rook, player)
-      introduce_computer if player.is_a?(Computer)  # Display computer move info
-      make_castling_moves(king, rook, player, piece_stats)  # Execute castling
-      update_castling_notation(player, notation)  # Update move notation
+      introduce_computer if player.is_a?(Computer) # Display computer move info
+      make_castling_moves(king, rook, player, piece_stats) # Execute castling
+      update_castling_notation(player, notation) # Update move notation
       true
     else
       # Display error for invalid castling attempt
@@ -125,13 +125,13 @@ module Configurable
   # @param promoted_piece [Chess] The piece that is used to replace the pawn in case of a promotion
   # @return [void]
   def change_state(player, destination, piece_stats, piece, promoted_piece = nil)
-    update_non_castling_notation(player, piece_stats, piece, destination, promoted_piece)  # Update move notation
-    exchange_positions(player, destination)  # Handle piece position changes
-    player.king[0].checked_positions = checked_moves(player)  # Update check status
+    update_non_castling_notation(player, piece_stats, piece, destination, promoted_piece) # Update move notation
+    exchange_positions(player, destination) # Handle piece position changes
+    player.king[0].checked_positions = checked_moves(player) # Update check status
 
     # Update computer opponent's available moves if applicable
     opponent(player).available_destinations = available_destinations(player) if opponent(player).is_a?(Computer)
-        standard_movements(piece, player, destination, promoted_piece)  # Complete standard move processing
+    standard_movements(piece, player, destination, promoted_piece) # Complete standard move processing
   end
 
   # Public: Handles piece position exchanges during moves
@@ -139,13 +139,11 @@ module Configurable
   # @param destination [Array<Integer, Integer>] The position in which a selected piece is moved to
   # @return [void]
   def exchange_positions(player, destination)
-    opp_loc = finalize_destination(player, destination)  # Get final destination (handles en passant)
+    opp_loc = finalize_destination(player, destination) # Get final destination (handles en passant)
 
     # Clear opponent piece if captured
-    if board.layout[opp_loc[0]][opp_loc[1]]
-      board.layout[opp_loc[0]][opp_loc[1]].current_position = nil
-    end
-    board.layout[opp_loc[0]][opp_loc[1]] = nil  # Clear board position
+    board.layout[opp_loc[0]][opp_loc[1]].current_position = nil if board.layout[opp_loc[0]][opp_loc[1]]
+    board.layout[opp_loc[0]][opp_loc[1]] = nil # Clear board position
   end
 
   # Public: Determines final destination accounting for en passant
@@ -166,8 +164,8 @@ module Configurable
     # Handle en passant flag for pawns
     piece.double_step[1] = true if prove_en_passant(piece, player, destination) && piece.first_move
 
-    en_passant_target = en_passant_eligible(player)  # Get en passant target if applicable
-    arrange_board(piece, destination, promoted_piece)  # Update board state
+    en_passant_target = en_passant_eligible(player) # Get en passant target if applicable
+    arrange_board(piece, destination, promoted_piece) # Update board state
 
     # Reset en passant flag if not applicable
     en_passant_target.double_step[1] = false unless negate_en_passant(en_passant_target)
@@ -179,14 +177,14 @@ module Configurable
   # @param promoted_piece [Chess] The piece that is used to replace the pawn in case of a promotion
   # @return [void]
   def arrange_board(piece, destination, promoted_piece)
-    target = promoted_piece.nil? ? piece : promoted_piece  # Use promoted piece if applicable
+    target = promoted_piece.nil? ? piece : promoted_piece # Use promoted piece if applicable
 
     # Clear original position and set new position
     board.layout[piece.current_position[0]][piece.current_position[1]] = nil
     board.layout[destination[0]][destination[1]] = target
     target.current_position = destination
 
-    reset_piece(target)  # Reset move flags if needed
+    reset_piece(target) # Reset move flags if needed
   end
 
   # Public: Gets all available destination squares for a player

@@ -24,7 +24,7 @@ class Chess
     @possible_moves = []       # Must be populated by subclass
     @current_position = nil    # Set when piece is placed on board
     @continuous_movement = true # Default true (for rook/bishop/queen), false for others
-    @first_move = true         # Tracks if piece hasn't moved yet
+    @first_move = true # Tracks if piece hasn't moved yet
     # Note: capture_moves, king_castling, and queen_castling are typically
     # initialized in subclasses that need them (like Pawn and King)
   end

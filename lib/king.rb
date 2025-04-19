@@ -8,12 +8,12 @@ class King < Chess
   # @param player_number [Integer] 1 for player 1 (usually white), 2 for player 2 (usually black)
   # @return [King] an instance of King
   def initialize(player_number)
-    super()  # Calls parent Chess class's initialize method
+    super() # Calls parent Chess class's initialize method
 
     # All possible one-square movement directions for the king:
     # horizontal, vertical, and diagonal (8 possible moves)
     @possible_moves = [
-      [1, 0],   # South
+      [1, 0], # South
       [1, 1],    # South-East
       [0, 1],    # East
       [-1, 1],   # North-East
@@ -42,6 +42,6 @@ class King < Chess
   # Resets special move flags after the king has moved
   # (primarily used to disable castling after king's first move)
   def reset_moves
-    @first_move = false if @first_move  # Only update if it's still true
+    @first_move = false if @first_move # Only update if it's still true
   end
 end

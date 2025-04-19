@@ -167,6 +167,7 @@ module Exceptionable
     # @return [Boolean] true (false) if it fulfills the en passant conditions
     def prove_en_passant(piece, player, destination)
       return false if piece.double_step.nil?
+
       en_passant_target(player, destination) && pawn_blocked?([piece.double_step[0]], [destination], piece)
     end
 
@@ -253,6 +254,7 @@ module Exceptionable
     # @return [Boolean] true (false) if the castling path is (not) clear
     def unblocked_castling?(king, rook)
       return false if invalid_caslting(king, rook) # Return false if it not eligible for castling
+
       # The files between the king and the rook
       range = path_between(king.current_position[1], rook.current_position[1])
       # Check if the files between the king and the rook are all clear

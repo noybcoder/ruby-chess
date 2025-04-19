@@ -60,3 +60,7 @@ class Computer < Player
     king[0].castling_type == 'king_castling' ? [king[0], rook[0], 'O-O'] : [king[0], rook[1], 'O-O-O']
   end
 end
+
+computer = Computer.new
+computer.rook[0].current_position = nil
+p computer.valid_castling

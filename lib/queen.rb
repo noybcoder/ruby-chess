@@ -8,7 +8,7 @@ class Queen < Chess
   # Public: Initializes a new Queen with its combined movement capabilities.
   # @return [Queen] an instance of Queen
   def initialize
-    super  # Calls the parent Chess class's initialize method
+    super # Calls the parent Chess class's initialize method
 
     # All possible movement directions for the queen (combination of rook and bishop moves).
     # The queen can move any number of squares in straight lines (like a rook)

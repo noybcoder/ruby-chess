@@ -8,7 +8,7 @@ class Rook < Chess
   # @param player_number [Integer] 1 for player 1 (typically white), 2 for player 2 (typically black)
   # @return [Rook] an instance of Rook
   def initialize(player_number)
-    super()  # Initialize base Chess class attributes
+    super() # Initialize base Chess class attributes
 
     # All possible straight movement directions for the rook:
     # The rook can move any number of squares vertically or horizontally
@@ -18,7 +18,7 @@ class Rook < Chess
       [-1, 0],  # Up (negative rank)
       [0, -1]   # Left (negative file)
     ]
-    # Note: @continuous_movement=true (inherited from Chess) enables sliding movement
+    # NOTE: @continuous_movement=true (inherited from Chess) enables sliding movement
 
     # Castling target positions (different for each player):
     # These represent where the rook moves during castling
@@ -29,6 +29,6 @@ class Rook < Chess
   # Disables castling eligibility after the rook's first move
   # This is called when the rook moves for the first time
   def reset_moves
-    @first_move = false if @first_move  # Only update if it's still true
+    @first_move = false if @first_move # Only update if it's still true
   end
 end

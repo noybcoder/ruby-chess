@@ -7,7 +7,7 @@ class Bishop < Chess
   # Public: Initializes a new Bishop with its characteristic diagonal movement pattern.
   # @return [Bishop] an instance of Bishop
   def initialize
-    super  # Calls the parent Chess class's initialize method
+    super # Calls the parent Chess class's initialize method
 
     # All possible diagonal movement directions for the bishop.
     # Bishops can move any number of squares diagonally (handled by continuous_movement=true from parent).
@@ -18,7 +18,7 @@ class Bishop < Chess
       [-1, -1],  # Up-left diagonal (negative rank, negative file)
       [1, -1]    # Down-left diagonal (positive rank, negative file)
     ]
-    # Note: The @continuous_movement=true (inherited from Chess parent class)
+    # NOTE: The @continuous_movement=true (inherited from Chess parent class)
     # allows the bishop to slide multiple squares in these directions.
   end
 end

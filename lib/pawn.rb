@@ -8,12 +8,12 @@ class Pawn < Chess
   # @param player_number [Integer] 1 for player 1 (usually white), 2 for player 2 (usually black)
   # @return [Pawn] an instance of Pawn
   def initialize(player_number)
-    super()  # Initialize base Chess class attributes
+    super() # Initialize base Chess class attributes
 
     # Set movement rules based on player (direction changes for white vs black):
     # - Player 1 (white) moves upward (increasing rank)
     # - Player 2 (black) moves downward (decreasing rank)
-    @possible_moves = player_number == 1 ? [[1, 0]] : [[-1, 0]]  # Single forward move
+    @possible_moves = player_number == 1 ? [[1, 0]] : [[-1, 0]] # Single forward move
 
     # Diagonal capture moves (different directions for each player)
     @capture_moves = player_number == 1 ? [[1, -1], [1, 1]] : [[-1, 1], [-1, -1]]
@@ -31,12 +31,12 @@ class Pawn < Chess
 
   # Disables special first move privileges after pawn has moved
   def reset_moves
-    @first_move = false  # Pawns can't double-step after first move
+    @first_move = false # Pawns can't double-step after first move
   end
 
   # Checks if pawn has reached promotion rank
   # @return [Boolean] true if pawn is on its promotion rank
   def promoted_position?
-    @current_position[0] == @promotion_rank  # Compare current rank with promotion rank
+    @current_position[0] == @promotion_rank # Compare current rank with promotion rank
   end
 end

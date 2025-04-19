@@ -7,7 +7,7 @@ class Knight < Chess
   # Public: Initializes a new Knight with its characteristic L-shaped movement pattern.
   # @return [Knight] an instance of Knight
   def initialize
-    super  # Calls the parent Chess class's initialize method
+    super # Calls the parent Chess class's initialize method
 
     # All possible L-shaped moves for the knight (8 possible directions).
     # Knights move in an L-shape: two squares in one direction and then one square perpendicular.
