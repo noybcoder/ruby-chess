@@ -13,7 +13,7 @@ module Updatable
     player.notation.clear # Zero out the notation
     player.notation[0] = piece_notation(piece_stats, active_piece) # Chess symbol (e.g., 'N' for knight)
     player.notation[1] = origin_notation(player, active_piece, destination) # Disambiguation if needed
-    player.notation[2] = capture_notation(player, destination) # 'x' if capture
+    player.notation[2] = capture_notation(destination) # 'x' if capture
     location_notation(player, destination) # Destination square and en passant
     player.notation[4] = promotion_notation(piece_stats, promoted_piece) # Promotion if applicable
   end
@@ -45,10 +45,9 @@ module Updatable
   end
 
   # Public: Determines if the move is a capture
-  # @param _player [Player] The player making the move (unused)
   # @param destination [Array] Target coordinates [rank, file]
   # @return [String, nil] "x" if capturing, otherwise nil
-  def capture_notation(_player, destination)
+  def capture_notation(destination)
     'x' unless board.layout[destination[0]][destination[1]].nil?
   end
 
@@ -92,8 +91,8 @@ module Updatable
   # Public: Converts board coordinates to algebraic notation
   # @param location [Array] Coordinates [rank, file]
   # @return [Array] File and rank in algebraic notation (e.g., ["e", "5"])
-  def board_notation(location)
-    [board.files[location[1]], board.ranks[location[0]]]
+  def board_notation(location, obj = board)
+    [obj.files[location[1]], obj.ranks[location[0]]]
   end
 
   # Public: Finds all possible origin locations for pieces that could move to destination

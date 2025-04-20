@@ -68,7 +68,7 @@ RSpec.describe Computer do
 
     context 'when all of the computer\'s pieces are captured' do
       before do
-        computer.retrieve_pieces.each{ |piece| piece.current_position = nil }
+        computer.retrieve_pieces.each { |piece| piece.current_position = nil }
       end
 
       it 'returns 0 as the available pieces' do
@@ -88,7 +88,7 @@ RSpec.describe Computer do
   describe '#available_castling_types' do
     context 'when both rooks and the king are still around' do
       it 'returns both king_castling and queen_castling' do
-        expect(computer.available_castling_types).to eq(['king_castling', 'queen_castling'])
+        expect(computer.available_castling_types).to eq(%w[king_castling queen_castling])
       end
     end
 
@@ -133,6 +133,5 @@ RSpec.describe Computer do
         expect(computer.valid_castling[-1]).to eq('O-O')
       end
     end
-
   end
 end

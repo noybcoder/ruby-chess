@@ -148,6 +148,15 @@ class Game
       next if invalid_notation(move_elements, player) # Skip if invalid move
       break if process_notation(PIECE_STATS, move_elements, player, king, rook) # Exit if valid move processed
     end
+    reveal_move(player_num, player)
+  end
+
+  # Public: Prints the move made by the player
+  # @param player_num [Integer] the player number (1 or 2)
+  # @param player [Player] the current player
+  # @return [void]
+  def reveal_move(player_num, player)
+    puts "\nPlayer #{player_num} just made this move => #{player.notation.join}\n\n"
   end
 
   # Public: Prompts human player for move notation
@@ -196,14 +205,14 @@ end
 
 game = Game.new
 
-0.upto(7) do |idx|
-  game.board.layout[6][idx].current_position = nil
-  game.board.layout[6][idx] = nil
+# 0.upto(7) do |idx|
+#   game.board.layout[6][idx].current_position = nil
+#   game.board.layout[6][idx] = nil
 
-  unless[0, 4, 7].include?(idx)
-    game.board.layout[7][idx].current_position = nil
-    game.board.layout[7][idx] = nil
-  end
-end
+#   unless[0, 4, 7].include?(idx)
+#     game.board.layout[7][idx].current_position = nil
+#     game.board.layout[7][idx] = nil
+#   end
+# end
 
 game.play

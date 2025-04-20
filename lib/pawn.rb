@@ -37,6 +37,8 @@ class Pawn < Chess
   # Checks if pawn has reached promotion rank
   # @return [Boolean] true if pawn is on its promotion rank
   def promoted_position?
+    return false if current_position.nil?
+
     @current_position[0] == @promotion_rank # Compare current rank with promotion rank
   end
 end
