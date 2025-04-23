@@ -8,6 +8,7 @@ RSpec.describe Board do
 
   before do
     described_class.board_count = 0
+    allow($stdout).to receive(:write)
   end
 
   describe '#initialize' do

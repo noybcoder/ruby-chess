@@ -5,10 +5,13 @@ require './lib/errors'
 
 RSpec.describe Player do
   subject(:player) { described_class.new }
+  before do
+    described_class.player_count = 0
+    allow($stdout).to receive(:write)
+  end
+
 
   describe '#initialize' do
-    before { described_class.player_count = 0 }
-
     matcher :be_shown_as do |unicode_char|
       match { |piece| piece.unicode[0] == unicode_char }
     end
@@ -160,7 +163,6 @@ RSpec.describe Player do
 
   describe '#piece_locations' do
     context 'when the first player calls the piece_locations at the beginning' do
-      before { described_class.player_count = 0 }
       it 'returns the locations of each of the first player\'s pieces' do
         locations = [
           [0, 4], [0, 3], [0, 0], [0, 7], [0, 2], [0, 5], [0, 1], [0, 6],

@@ -27,12 +27,12 @@ module Parseable
   # Handles three notation formats: rank-only, file-only, or full coordinate
   # @param move_elements [Array] Split components of the move notation
   # @return [Array, nil] Array containing position and axis info, or nil if invalid
-  def parse_origin(move_elements)
+  def parse_origin(move_elements, obj = board)
     origin = move_elements[1]
     case origin
     in /^[1-8]$/ then [[origin.to_i - 1], [0]] # Rank-only (e.g., "3")
-    in /^[a-h]$/ then [[board.files.find_index(origin)], [1]] # File-only (e.g., "e")
-    in /^[a-h]{1}[1-8]{1}$/ then [[origin[-1].to_i - 1, board.files.find_index(origin[0])], [0, 1]] # Full coordinate (e.g., "e5")
+    in /^[a-h]$/ then [[obj.files.find_index(origin)], [1]] # File-only (e.g., "e")
+    in /^[a-h]{1}[1-8]{1}$/ then [[origin[-1].to_i - 1, obj.files.find_index(origin[0])], [0, 1]] # Full coordinate (e.g., "e5")
     else nil # Invalid format
     end
   end
@@ -47,8 +47,8 @@ module Parseable
   # Public: Parses destination coordinates from move notation
   # @param move_elements [Array] Split components of the move notation
   # @return [Array] The destination coordinates as [rank, file]
-  def parse_destination(move_elements)
-    [move_elements[3][-1].to_i - 1, board.files.find_index(move_elements[3][0])]
+  def parse_destination(move_elements, obj = board)
+    [move_elements[3][-1].to_i - 1, obj.files.find_index(move_elements[3][0])]
   end
 
   # Public: Parses promotion information from move notation

@@ -6,15 +6,8 @@ require './lib/traceable'
 require './lib/exceptionable'
 require './lib/configurable'
 require './lib/player'
-
-PIECE_STATS = {
-  King: { rank_locations: [4], letter: 'K' }, # King starts at file e (position 4)
-  Queen: { rank_locations: [3], letter: 'Q' }, # Queen starts at file d (position 3)
-  Rook: { rank_locations: [0, 7], letter: 'R' }, # Rooks start at files a and h (positions 0 and 7)
-  Bishop: { rank_locations: [2, 5], letter: 'B' }, # Bishops start at files c and f (positions 2 and 5)
-  Knight: { rank_locations: [1, 6], letter: 'N' }, # Knights start at files b and g (positions 1 and 6)
-  Pawn: { rank_locations: Array(0..7) } # Pawns are on all files (positions 0-7)
-}.freeze
+require './lib/board'
+require './lib/visualizable'
 
 RSpec.describe Updatable do
   let(:dummy_class) do
@@ -24,10 +17,14 @@ RSpec.describe Updatable do
       include Traceable
       include Exceptionable
       include Configurable
+      include Visualizable
     end.new
   end
+
+  let(:PIECE_STATS) { Visualizable::PIECE_STATS }
   let(:player) { Player.new }
   let(:board) { Board.new }
+
 
   before do
     Player.player_count = 0

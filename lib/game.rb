@@ -196,23 +196,9 @@ class Game
   def invalid_notation(move_elements, player)
     return false unless move_elements.nil?
 
-    return unless player.is_a?(Human)
+    return if player.is_a?(Computer)
 
     puts 'It not a valid chess notation. Please try again.'
     true
   end
 end
-
-game = Game.new
-
-# 0.upto(7) do |idx|
-#   game.board.layout[6][idx].current_position = nil
-#   game.board.layout[6][idx] = nil
-
-#   unless[0, 4, 7].include?(idx)
-#     game.board.layout[7][idx].current_position = nil
-#     game.board.layout[7][idx] = nil
-#   end
-# end
-
-game.play
