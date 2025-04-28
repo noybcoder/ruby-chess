@@ -201,7 +201,7 @@ module Configurable
   end
 
   # Public: Resets move flags for pieces with special first move rules
-  # @param player [Player] The player making the move
+  # @param target [Chess] The chess piece
   # @return [void]
   def reset_piece(target)
     target.reset_moves if [Pawn, King, Rook].any? { |piece| target.is_a?(piece) }

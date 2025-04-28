@@ -22,8 +22,8 @@ class Rook < Chess
 
     # Castling target positions (different for each player):
     # These represent where the rook moves during castling
-    @king_castling = player_number == 1 ? [0, 3] : [7, 3]   # Kingside castling position
-    @queen_castling = player_number == 1 ? [0, 5] : [7, 5]  # Queenside castling position
+    @king_castling = player_number == 1 ? [0, 5] : [7, 5]   # Kingside castling position
+    @queen_castling = player_number == 1 ? [0, 3] : [7, 3]  # Queenside castling position
   end
 
   # Disables castling eligibility after the rook's first move

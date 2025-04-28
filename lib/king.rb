@@ -29,8 +29,8 @@ class King < Chess
     # Castling target positions (different for each player):
     # - Player 1 (usually white) castles on rank 0 (traditional chess rank 1)
     # - Player 2 (usually black) castles on rank 7 (traditional chess rank 8)
-    @king_castling = player_number == 1 ? [0, 2] : [7, 2]    # Kingside castling target (g-file)
-    @queen_castling = player_number == 1 ? [0, 6] : [7, 6]   # Queenside castling target (c-file)
+    @king_castling = player_number == 1 ? [0, 6] : [7, 6]    # Kingside castling target (g-file)
+    @queen_castling = player_number == 1 ? [0, 2] : [7, 2]   # Queenside castling target (c-file)
 
     # Tracks if castling is available/being performed (nil, :king_side, or :queen_side)
     @castling_type = nil

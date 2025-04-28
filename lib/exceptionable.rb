@@ -30,7 +30,9 @@ module Exceptionable
     # @param player [Player] The player making the move
     # @return [Boolean] True if no escape moves available
     def check_next?(player)
-      (checked_moves(player) - opponent_next_moves(player)).empty?
+      moves = checked_moves(player)
+      return false if moves.empty?
+      (moves - opponent_next_moves(player)).empty?
     end
 
     # Public: Gets all potential opponent moves that could maintain check

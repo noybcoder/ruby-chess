@@ -170,15 +170,15 @@ RSpec.describe Parseable do
           it 'returns an instance of King' do
             expect(result[0]).to be_chess(King)
             expect(result[0].current_position).to eq([0, 4])
-            expect(result[0].queen_castling).to eq([0, 6])
-            expect(result[0].king_castling).to eq([0, 2])
+            expect(result[0].queen_castling).to eq([0, 2])
+            expect(result[0].king_castling).to eq([0, 6])
           end
 
           it 'returns the rook on the king side' do
             expect(result[1]).to be_chess(Rook)
-            expect(result[1].current_position).to eq([0, 7])
-            expect(result[1].queen_castling).to eq([0, 5])
-            expect(result[1].king_castling).to eq([0, 3])
+            expect(result[1].current_position).to eq([0, 0])
+            expect(result[1].queen_castling).to eq([0, 3])
+            expect(result[1].king_castling).to eq([0, 5])
           end
 
           it 'returns O-O-O' do
@@ -194,15 +194,15 @@ RSpec.describe Parseable do
           it 'returns an instance of King' do
             expect(result[0]).to be_chess(King)
             expect(result[0].current_position).to eq([0, 4])
-            expect(result[0].queen_castling).to eq([0, 6])
-            expect(result[0].king_castling).to eq([0, 2])
+            expect(result[0].queen_castling).to eq([0, 2])
+            expect(result[0].king_castling).to eq([0, 6])
           end
 
           it 'returns the rook on the king side' do
             expect(result[1]).to be_chess(Rook)
-            expect(result[1].current_position).to eq([0, 0])
-            expect(result[1].queen_castling).to eq([0, 5])
-            expect(result[1].king_castling).to eq([0, 3])
+            expect(result[1].current_position).to eq([0, 7])
+            expect(result[1].queen_castling).to eq([0, 3])
+            expect(result[1].king_castling).to eq([0, 5])
           end
 
           it 'returns O-O' do
@@ -222,15 +222,15 @@ RSpec.describe Parseable do
           it 'returns an instance of King' do
             expect(result[0]).to be_chess(King)
             expect(result[0].current_position).to eq([7, 4])
-            expect(result[0].queen_castling).to eq([7, 6])
-            expect(result[0].king_castling).to eq([7, 2])
+            expect(result[0].queen_castling).to eq([7, 2])
+            expect(result[0].king_castling).to eq([7, 6])
           end
 
-          it 'returns the rook on the king side' do
+          it 'returns the rook on the queen side' do
             expect(result[1]).to be_chess(Rook)
-            expect(result[1].current_position).to eq([7, 7])
-            expect(result[1].queen_castling).to eq([7, 5])
-            expect(result[1].king_castling).to eq([7, 3])
+            expect(result[1].current_position).to eq([7, 0])
+            expect(result[1].queen_castling).to eq([7, 3])
+            expect(result[1].king_castling).to eq([7, 5])
           end
 
           it 'returns O-O-O' do
@@ -245,15 +245,15 @@ RSpec.describe Parseable do
           it 'returns an instance of King' do
             expect(result[0]).to be_chess(King)
             expect(result[0].current_position).to eq([7, 4])
-            expect(result[0].queen_castling).to eq([7, 6])
-            expect(result[0].king_castling).to eq([7, 2])
+            expect(result[0].queen_castling).to eq([7, 2])
+            expect(result[0].king_castling).to eq([7, 6])
           end
 
-          it 'returns the rook on the queen side' do
+          it 'returns the rook on the king side' do
             expect(result[1]).to be_chess(Rook)
-            expect(result[1].current_position).to eq([7, 0])
-            expect(result[1].queen_castling).to eq([7, 5])
-            expect(result[1].king_castling).to eq([7, 3])
+            expect(result[1].current_position).to eq([7, 7])
+            expect(result[1].queen_castling).to eq([7, 3])
+            expect(result[1].king_castling).to eq([7, 5])
           end
 
           it 'returns O-O' do

@@ -21,12 +21,12 @@ RSpec.describe King do
           expect(king.possible_moves).to eq(moves)
         end
 
-        it 'returns [0, 2] as king castling' do
-          expect(king.king_castling).to eq([0, 2])
+        it 'returns [0, 6] as king castling' do
+          expect(king.king_castling).to eq([0, 6])
         end
 
-        it 'returns [0, 6] as queen castling' do
-          expect(king.queen_castling).to eq([0, 6])
+        it 'returns [0, 2] as queen castling' do
+          expect(king.queen_castling).to eq([0, 2])
         end
       end
     end
@@ -47,12 +47,12 @@ RSpec.describe King do
           expect(king2.possible_moves).to eq(moves)
         end
 
-        it 'returns [7, 2] as king castling' do
-          expect(king2.king_castling).to eq([7, 2])
+        it 'returns [7, 6] as king castling' do
+          expect(king2.king_castling).to eq([7, 6])
         end
 
-        it 'returns [7, 6] as queen castling' do
-          expect(king2.queen_castling).to eq([7, 6])
+        it 'returns [7, 2] as queen castling' do
+          expect(king2.queen_castling).to eq([7, 2])
         end
       end
     end

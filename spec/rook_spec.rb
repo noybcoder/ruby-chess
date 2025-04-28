@@ -22,11 +22,11 @@ RSpec.describe Rook do
         end
 
         it 'returns [0, 3] as king castling' do
-          expect(rook.king_castling).to eq([0, 3])
+          expect(rook.king_castling).to eq([0, 5])
         end
 
         it 'returns [0, 5] as queen castling' do
-          expect(rook.queen_castling).to eq([0, 5])
+          expect(rook.queen_castling).to eq([0, 3])
         end
       end
     end
@@ -48,11 +48,11 @@ RSpec.describe Rook do
         end
 
         it 'returns [7, 3] as king castling' do
-          expect(rook2.king_castling).to eq([7, 3])
+          expect(rook2.king_castling).to eq([7, 5])
         end
 
         it 'returns [7, 5] as queen castling' do
-          expect(rook2.queen_castling).to eq([7, 5])
+          expect(rook2.queen_castling).to eq([7, 3])
         end
       end
     end

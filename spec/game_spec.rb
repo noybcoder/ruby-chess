@@ -151,13 +151,84 @@ RSpec.describe Game do
     end
   end
 
-
   describe '#players' do
     context 'when the method is called' do
       it 'returns a 2-element array of players 1 and 2' do
         expect(game.players.count).to eq(2)
         expect(game.players[0]).to be(game.player1)
         expect(game.players[1]).to be(game.player2)
+      end
+    end
+  end
+
+  describe '#access_progress' do
+    context 'when the access progress is defaulted to save the first player chooses not to save' do
+      before do
+        allow(game.player1).to receive(:make_choice).and_return("n\n")
+      end
+
+      it 'prompts the message asking the player if they want to save and returns "n" as the output' do
+        msg = "\nWould you like to save your latest game progress? (y/n)\n"
+        expect{game.access_progress}.to output(msg).to_stdout
+        expect(game.access_progress).to eq("n\n")
+        game.access_progress
+
+      end
+    end
+
+    context 'when the access progress is defaulted to save the first player chooses to save' do
+      before do
+        allow(game.player1).to receive(:make_choice).and_return("y\n")
+      end
+
+      it 'prompts the message asking the player if they want to save and returns "y" as the output' do
+        msg = "\nWould you like to save your latest game progress? (y/n)\n"
+        expect{game.access_progress}.to output(msg).to_stdout
+        expect(game.access_progress).to eq("y\n")
+        game.access_progress
+
+      end
+    end
+
+    context 'when the access progress is switched to load the first player chooses not to load' do
+      before do
+        allow(game.player1).to receive(:make_choice).and_return("n\n")
+      end
+
+      it 'prompts the message asking the player if they want to load and returns "n" as the output' do
+        msg = "\nWould you like to load your latest game progress? (y/n)\n"
+        expect{game.access_progress('load')}.to output(msg).to_stdout
+        expect(game.access_progress('load')).to eq("n\n")
+        game.access_progress
+
+      end
+    end
+
+    context 'when the access progress is switched to load the first player chooses to load' do
+      before do
+        allow(game.player1).to receive(:make_choice).and_return("y\n")
+      end
+
+      it 'prompts the message asking the player if they want to load and returns "y" as the output' do
+        msg = "\nWould you like to load your latest game progress? (y/n)\n"
+        expect{game.access_progress('load')}.to output(msg).to_stdout
+        expect(game.access_progress('load')).to eq("y\n")
+        game.access_progress
+
+      end
+    end
+
+    context 'when the first player enters something other y or n' do
+      before do
+        allow(game.player1).to receive(:make_choice).and_return("weroifjeoi\n", "y\n")
+      end
+
+      it 'prompts the message asking the player if they want to load and returns "y" as the output' do
+        msg = "\nWould you like to load your latest game progress? (y/n)\n"
+        expect{game.access_progress('load')}.to output(msg * 2).to_stdout
+        expect(game.access_progress('load')).to eq("y\n")
+        game.access_progress
+
       end
     end
   end

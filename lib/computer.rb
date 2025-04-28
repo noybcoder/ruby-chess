@@ -46,7 +46,7 @@ class Computer < Player
       next if king.current_position.nil? || rook.current_position.nil? # Skip if pieces are captured
 
       # Determine castling type based on relative positions
-      king.castling_type = king.current_position[1] > rook.current_position[1] ? 'king_castling' : 'queen_castling'
+      king.castling_type = king.current_position[1] < rook.current_position[1] ? 'king_castling' : 'queen_castling'
     end
   end
 
@@ -57,6 +57,6 @@ class Computer < Player
     king[0].castling_type = castling # Set castling type on king
 
     # Return appropriate pieces and notation based on castling type
-    king[0].castling_type == 'king_castling' ? [king[0], rook[0], 'O-O'] : [king[0], rook[1], 'O-O-O']
+    king[0].castling_type == 'king_castling' ? [king[0], rook[1], 'O-O'] : [king[0], rook[0], 'O-O-O']
   end
 end

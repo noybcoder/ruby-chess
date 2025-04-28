@@ -88,21 +88,21 @@ RSpec.describe Computer do
   describe '#available_castling_types' do
     context 'when both rooks and the king are still around' do
       it 'returns both king_castling and queen_castling' do
-        expect(computer.available_castling_types).to eq(%w[king_castling queen_castling])
+        expect(computer.available_castling_types).to contain_exactly('king_castling', 'queen_castling')
       end
     end
 
     context 'when the rook on the queen side is removed' do
-      it 'returns queen castling' do
+      it 'returns king castling' do
         computer.rook[0].current_position = nil
-        expect(computer.available_castling_types).to eq(['queen_castling'])
+        expect(computer.available_castling_types).to eq(['king_castling'])
       end
     end
 
     context 'when the rook on the king side is removed' do
-      it 'returns king castling' do
+      it 'returns queen castling' do
         computer.rook[1].current_position = nil
-        expect(computer.available_castling_types).to eq(['king_castling'])
+        expect(computer.available_castling_types).to eq(['queen_castling'])
       end
     end
   end
@@ -116,20 +116,20 @@ RSpec.describe Computer do
       end
     end
 
-    context 'when the rook on the queen side is removed' do
+    context 'when the rook on the king side is removed' do
       it 'returns the positions of the king and the rook (queen side) and the queen castling notation' do
-        computer.rook[0].current_position = nil
+        computer.rook[1].current_position = nil
         expect(computer.valid_castling[0].current_position).to eq([0, 4])
-        expect(computer.valid_castling[1].current_position).to eq([0, 7])
+        expect(computer.valid_castling[1].current_position).to eq([0, 0])
         expect(computer.valid_castling[-1]).to eq('O-O-O')
       end
     end
 
     context 'when the rook on the king side is removed' do
       it 'returns the positions of the king and the rook (king side) and the king castling notation' do
-        computer.rook[1].current_position = nil
+        computer.rook[0].current_position = nil
         expect(computer.valid_castling[0].current_position).to eq([0, 4])
-        expect(computer.valid_castling[1].current_position).to eq([0, 0])
+        expect(computer.valid_castling[1].current_position).to eq([0, 7])
         expect(computer.valid_castling[-1]).to eq('O-O')
       end
     end

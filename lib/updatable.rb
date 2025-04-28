@@ -39,9 +39,9 @@ module Updatable
   # Public: Returns en passant notation if the move is an en passant capture
   # @param player [Player] The player making the move
   # @param destination [Array] Target coordinates [rank, file]
-  # @return [String, nil] ".e.p" if en passant, otherwise nil
+  # @return [String, nil] "e.p." if en passant, otherwise nil
   def en_passant_notation(player, destination)
-    ' .e.p' if en_passant?(player, destination)
+    ' e.p.' if en_passant?(player, destination)
   end
 
   # Public: Determines if the move is a capture
