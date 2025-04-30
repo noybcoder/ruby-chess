@@ -1,21 +1,7 @@
 # frozen_string_literal: true
 
-require './lib/exceptionable'
-require './lib/game'
-require './lib/visualizable'
-
 RSpec.describe Exceptionable do
   let(:game) { Game.new }
-
-  let(:dummy_class) do
-    Class.new do
-      include Exceptionable::EnPassant
-      include Exceptionable::Check
-      include Exceptionable::EnPassant
-      include Exceptionable::Castling
-      include Visualizable
-    end.new
-  end
 
   matcher :be_file do
     match { |p| p.current_position[0] }

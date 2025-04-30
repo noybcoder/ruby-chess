@@ -202,3 +202,16 @@ class Game
     true
   end
 end
+
+# game = Game.new
+
+# game.board.layout[1][3].current_position = nil
+# game.board.layout[1][3] = game.board.layout[6][4]
+# game.board.layout[6][4] = nil
+# game.board.layout[1][3].current_position = [1, 3]
+
+# game.board.layout[2][2] = game.board.layout[7][3]
+# game.board.layout[7][3] = nil
+# game.board.layout[2][2].current_position = [2, 2]
+
+# game.play

@@ -1,13 +1,5 @@
 # frozen_string_literal: true
 
-require './lib/updatable'
-require './lib/conditionable'
-require './lib/traceable'
-require './lib/exceptionable'
-require './lib/configurable'
-require './lib/game'
-require './lib/visualizable'
-
 RSpec.describe Configurable do
   let(:game) { Game.new }
 
@@ -16,20 +8,6 @@ RSpec.describe Configurable do
     Board.board_count = 0
     allow_any_instance_of(Human).to receive(:make_choice).and_return("2\n")
     allow($stdout).to receive(:write)
-  end
-
-  let(:dummy_class) do
-    Class.new do
-      include Updatable
-      include Conditionable
-      include Traceable
-      include Exceptionable::EnPassant
-      include Exceptionable::Check
-      include Exceptionable::EnPassant
-      include Exceptionable::Castling
-      include Configurable
-      include Visualizable
-    end.new
   end
 
   describe '#process_notation' do

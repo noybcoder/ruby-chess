@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require './lib/parseable'
-require './lib/player'
 
 PIECE_STATS = {
   King: { rank_locations: [4], letter: 'K' }, # King starts at file e (position 4)
