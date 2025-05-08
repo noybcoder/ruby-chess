@@ -25,7 +25,6 @@ RSpec.describe Parseable do
     match { |p| p.is_a?(piece) }
   end
 
-
   describe '#parse_piece' do
     before { Player.player_count = 0 }
     context 'when the command Kb2 is given' do
@@ -34,7 +33,6 @@ RSpec.describe Parseable do
         result = dummy_class.parse_piece(PIECE_STATS, move_elements, player)
         expect(result).to all(be_chess(King))
         expect(result.count).to eq(1)
-
       end
     end
 

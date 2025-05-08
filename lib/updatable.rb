@@ -13,7 +13,7 @@ module Updatable
     player.notation.clear # Zero out the notation
     player.notation[0] = piece_notation(piece_stats, active_piece) # Chess symbol (e.g., 'N' for knight)
     player.notation[1] = origin_notation(player, active_piece, destination) # Disambiguation if needed
-    player.notation[2] = capture_notation(destination) # 'x' if capture
+    player.notation[2] = capture_notation(player, active_piece, destination) # 'x' if capture
     location_notation(player, destination) # Destination square and en passant
     player.notation[4] = promotion_notation(piece_stats, promoted_piece) # Promotion if applicable
   end
@@ -45,10 +45,12 @@ module Updatable
   end
 
   # Public: Determines if the move is a capture
+  # @param player [Player] The player making the move
+  # @param active_piece [Chess] The piece being moved
   # @param destination [Array] Target coordinates [rank, file]
   # @return [String, nil] "x" if capturing, otherwise nil
-  def capture_notation(destination)
-    'x' unless board.layout[destination[0]][destination[1]].nil?
+  def capture_notation(player, active_piece, destination)
+    'x' if en_passant?(player, destination) || !board.layout[destination[0]][destination[1]].nil? || promotable?(active_piece)
   end
 
   # Public: Generates promotion notation if a pawn is being promoted
@@ -66,7 +68,7 @@ module Updatable
   # @return [String, nil] Disambiguation notation if needed
   def origin_notation(player, active_piece, destination)
     locations = selected_locations(player, active_piece, destination)
-    return nil if locations.count == 1 # No disambiguation needed if only one piece can move there
+    return nil if locations.count <= 1 && !en_passant?(player, destination) # No disambiguation needed if only one piece can move there
 
     assign_origin(locations, player, active_piece, destination)
   end
@@ -84,7 +86,7 @@ module Updatable
     elsif locations.all? { |_x, y| y == locations[0][1] }
       loc_notation[1] # Use rank number if all on same file
     else
-      loc_notation.join # Use full coordinate if needed
+      loc_notation # Use full coordinate if needed
     end
   end
 

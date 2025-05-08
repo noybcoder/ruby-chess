@@ -6,13 +6,12 @@ require_relative 'player'
 # The Board class represents a chess board.
 class Board
   include CustomErrors # Includes custom error handling functionality
-  attr_reader :ranks, :files  # Board coordinates (1-8 and a-h)
+  attr_reader :background_colors, :color_offset, :ranks, :files
   attr_accessor :layout       # 2D array representing piece positions
 
   # Class-level attributes and methods
   class << self
     attr_accessor :board_count # Tracks number of board instances
-    attr_reader :background_colors, :color_offset # Display colors
   end
 
   # Class variables initialization

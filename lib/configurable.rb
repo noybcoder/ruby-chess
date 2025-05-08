@@ -52,7 +52,7 @@ module Configurable
       active_piece = active_pieces[0] if active_pieces.length == 1
       define_promoted_piece(active_piece, move_elements, piece_stats, player, destination)
     else
-      invalid_moves(player, active_pieces) # Handle ambiguous/invalid moves
+      invalid_moves(player, active_pieces, destination) # Handle ambiguous/invalid moves
     end
   end
 

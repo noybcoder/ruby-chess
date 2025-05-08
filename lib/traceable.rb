@@ -116,6 +116,7 @@ module Traceable
   # @return [Boolean] True if path is valid
   def valid_path?(destination, path, all_locations)
     return false if all_locations.empty?
+
     (path.last == destination) && empty_path?(path[0...-1], all_locations)
   end
 

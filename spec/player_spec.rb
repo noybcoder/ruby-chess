@@ -10,7 +10,6 @@ RSpec.describe Player do
     allow($stdout).to receive(:write)
   end
 
-
   describe '#initialize' do
     matcher :be_shown_as do |unicode_char|
       match { |piece| piece.unicode[0] == unicode_char }

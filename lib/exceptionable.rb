@@ -32,6 +32,7 @@ module Exceptionable
     def check_next?(player)
       moves = checked_moves(player)
       return false if moves.empty?
+
       (moves - opponent_next_moves(player)).empty?
     end
 
@@ -217,6 +218,7 @@ module Exceptionable
     # @param destination [Array<Integer, Integer>] The position in which a selected piece is moved to
     # @return [Array<Array<Integer, Integer>>] The en passant capture location
     def en_passant_locations(player, destination)
+      return [] if destination.nil?
       delta = [1, -1][player_turn(opponent(player))]
       [[destination[0] + delta, destination[1]]]
     end

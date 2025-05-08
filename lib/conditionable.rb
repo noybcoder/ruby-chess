@@ -54,11 +54,14 @@ module Conditionable
   # Public: Checks for ambiguous moves and provides user feedback
   # @param player [Player] The player making the move
   # @param active_pieces [Array<Chess>] Array of pieces that satisfy some conditions
+  # @param destination [Array<Integer, Integer>] The position in which a selected piece is moved to
   # @return [Boolean] False if moves are invalid, nil otherwise
-  def invalid_moves(player, active_pieces)
+  def invalid_moves(player, active_pieces, destination = nil)
     return if active_pieces.length == 1
 
-    if active_pieces.length > 1
+    if en_passant?(player, destination)
+      puts "\nThis is an en passant move. The notation should start with the file of the pawn performing the move.\n"
+    elsif active_pieces.length > 1
       puts "\nThere are #{active_pieces.length} pieces that can make the move. Please specify." if player.is_a?(Human)
     elsif player.is_a?(Human)
       puts "\nIt is not a valid move. Please try again.\n"
@@ -89,7 +92,19 @@ module Conditionable
   def active_piece_conditions(piece, player, destination, origin, idx)
     return false if piece.current_position.nil?
 
-    game_paths(piece, player, destination) && (!origin || ([piece.current_position.values_at(*idx)] & [origin]).any?)
+    game_paths(piece, player, destination) && correct_path?(piece, player, destination, origin, idx)
+  end
+
+  # Public: Checks conditions whether the origin must be specified in the notation
+  # @param piece [Chess] The piece being moved
+  # @param player [Player] The player making the move
+  # @param destination [Array<Integer, Integer>] The position in which a selected piece is moved to
+  # @param origin [Array<Integer>] The rank, file or both in which the piece starts off with
+  # @param idx [Integer] An integer to determine if rank or file should be selected if there is more one active piece
+  # @return [Boolean] True if move meets the conditions
+  def correct_path?(piece, player, destination, origin, idx)
+    (!en_passant?(player, destination) || origin) &&
+    (!origin || ([piece.current_position.values_at(*idx)] & [origin]).any?)
   end
 
   # Public: Selects pieces that can legally move to destination

@@ -61,16 +61,15 @@ RSpec.describe Rook do
   describe '#reset_moves' do
     context 'when the first move of the rook piece is true' do
       it 'changes the first move to false' do
-        expect{ rook.reset_moves }.to change(rook, :first_move).from(true).to(false)
+        expect { rook.reset_moves }.to change(rook, :first_move).from(true).to(false)
       end
     end
 
     context 'when the first move of the rook piece is false' do
       it 'does not changes the first move to false' do
         rook.instance_variable_set(:@first_move, false)
-        expect{ rook.reset_moves }.not_to change(rook, :first_move)
+        expect { rook.reset_moves }.not_to change(rook, :first_move)
       end
     end
-
   end
 end

@@ -33,13 +33,13 @@ RSpec.describe Exceptionable do
             game.board.layout[7][idx] = nil
           end
 
-          unless [4].include?(idx)
-            game.board.layout[0][idx].current_position = nil
-            game.board.layout[0][idx] = nil
+          next if [4].include?(idx)
 
-            game.board.layout[6][idx].current_position = nil
-            game.board.layout[6][idx] = nil
-          end
+          game.board.layout[0][idx].current_position = nil
+          game.board.layout[0][idx] = nil
+
+          game.board.layout[6][idx].current_position = nil
+          game.board.layout[6][idx] = nil
         end
 
         game.board.layout[2][1] = game.board.layout[7][1]
@@ -64,7 +64,6 @@ RSpec.describe Exceptionable do
         expect(game.check_mate?(game.player1)).to be(true)
       end
     end
-
   end
 
   describe '#check_now?' do
@@ -85,13 +84,13 @@ RSpec.describe Exceptionable do
             game.board.layout[7][idx] = nil
           end
 
-          unless [4].include?(idx)
-            game.board.layout[0][idx].current_position = nil
-            game.board.layout[0][idx] = nil
+          next if [4].include?(idx)
 
-            game.board.layout[6][idx].current_position = nil
-            game.board.layout[6][idx] = nil
-          end
+          game.board.layout[0][idx].current_position = nil
+          game.board.layout[0][idx] = nil
+
+          game.board.layout[6][idx].current_position = nil
+          game.board.layout[6][idx] = nil
         end
 
         game.board.layout[2][1] = game.board.layout[7][1]
@@ -136,13 +135,13 @@ RSpec.describe Exceptionable do
             game.board.layout[7][idx] = nil
           end
 
-          unless [4].include?(idx)
-            game.board.layout[0][idx].current_position = nil
-            game.board.layout[0][idx] = nil
+          next if [4].include?(idx)
 
-            game.board.layout[6][idx].current_position = nil
-            game.board.layout[6][idx] = nil
-          end
+          game.board.layout[0][idx].current_position = nil
+          game.board.layout[0][idx] = nil
+
+          game.board.layout[6][idx].current_position = nil
+          game.board.layout[6][idx] = nil
         end
 
         game.board.layout[2][1] = game.board.layout[7][1]
@@ -187,13 +186,13 @@ RSpec.describe Exceptionable do
             game.board.layout[7][idx] = nil
           end
 
-          unless [4].include?(idx)
-            game.board.layout[0][idx].current_position = nil
-            game.board.layout[0][idx] = nil
+          next if [4].include?(idx)
 
-            game.board.layout[6][idx].current_position = nil
-            game.board.layout[6][idx] = nil
-          end
+          game.board.layout[0][idx].current_position = nil
+          game.board.layout[0][idx] = nil
+
+          game.board.layout[6][idx].current_position = nil
+          game.board.layout[6][idx] = nil
         end
 
         game.board.layout[2][1] = game.board.layout[7][1]
@@ -439,7 +438,6 @@ RSpec.describe Exceptionable do
       end
     end
   end
-
 
   describe '#promotable?' do
     context 'when the third pawn of player 1 is not at the promotable position' do
@@ -741,7 +739,6 @@ RSpec.describe Exceptionable do
         expect(game.en_passant_prereq([4, 6])).to eq([[4, 5], [4, 7]])
       end
     end
-
   end
 
   describe '#castling' do
