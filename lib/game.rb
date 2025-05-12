@@ -47,15 +47,17 @@ class Game
   end
 
   # Public: Saves game state to file
+  # @param file_name [String] the file name in which the game data is stored
   # @return [void]
-  def save_progress
-    save_data(serialize_progress) # Write to save file
+  def save_progress(file_name = 'save.marshal')
+    save_data(serialize_progress, file_name) # Write to save file
   end
 
   # Public: Loads game state from file
+  # @param file_name [String] the file name in which the game data is stored
   # @return [void]
-  def load_progress
-    deserialize(self, load_data) # Restore game state
+  def load_progress(file_name = 'save.marshal')
+    deserialize(self, load_data(file_name)) # Restore game state
   end
 
   # Public: Prompts player about save/load operation
@@ -99,7 +101,7 @@ class Game
   # Public: Main game loop
   # @return [void]
   def play
-    load_progress if access_progress('load') == 'y' # Load game if requested
+    load_progress('save_2.marshal') if access_progress('load') == 'y' # Load game if requested
 
     loop do
       players.each do |player|
@@ -111,7 +113,7 @@ class Game
       end
       break if players.any?(&method(:win_condition)) # Exit if game over
 
-      save_progress if access_progress == 'y' # Save if requested
+      save_progress('save_2.marshal') if access_progress == 'y' # Save if requested
     end
   end
 
@@ -205,4 +207,19 @@ end
 
 
 # game = Game.new
+
+# 0.upto(7) do |idx|
+#   unless [4].include?(idx)
+#     game.board.layout[7][idx].current_position = nil
+#     game.board.layout[7][idx] = nil
+#   end
+
+#   game.board.layout[1][idx].current_position = nil
+#   game.board.layout[1][idx] = nil
+
+#   game.board.layout[1][idx] = game.board.layout[6][idx]
+#   game.board.layout[6][idx] = nil
+#   game.board.layout[1][idx].current_position = [1, idx]
+# end
+
 # game.play

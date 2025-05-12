@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
+require 'tempfile'
+
 RSpec.describe Serializable do
   let(:game) { Game.new }
+  let(:player1) { game.player1 }
+  let(:player2) { game.player2 }
+  let(:board) { game.board }
 
   before do
     Player.player_count = 0
@@ -30,18 +35,18 @@ RSpec.describe Serializable do
     context 'when the human (first player) object is selected' do
       it 'returns the instance variables of human (player1)' do
         variables = %i[@king @queen @rook @bishop @knight @pawn @notation]
-        expect(game.gather_variables(game.player1)).to contain_exactly(*variables)
+        expect(game.gather_variables(player1)).to contain_exactly(*variables)
       end
     end
 
     context 'when the human (second player) object is selected' do
-      before { allow(game.player1).to receive(:make_choice).and_return("1\n") }
+      before { allow(player1).to receive(:make_choice).and_return("1\n") }
       it 'returns the instance variables of human (player2)' do
         variables = %i[
           @available_destinations @bishop @king @knight
           @notation @pawn @player_count @queen @rook
         ]
-        expect(game.gather_variables(game.player2)).to contain_exactly(*variables)
+        expect(game.gather_variables(player2)).to contain_exactly(*variables)
       end
     end
 
@@ -51,14 +56,14 @@ RSpec.describe Serializable do
           @available_destinations @bishop @king @knight
           @notation @pawn @player_count @queen @rook
         ]
-        expect(game.gather_variables(game.player2)).to contain_exactly(*variables)
+        expect(game.gather_variables(player2)).to contain_exactly(*variables)
       end
     end
 
     context 'when the board object is selected' do
       it 'returns the instance variables of board' do
         variables = %i[@background_colors @board_count @color_offset @files @layout @ranks]
-        expect(game.gather_variables(game.board)).to contain_exactly(*variables)
+        expect(game.gather_variables(board)).to contain_exactly(*variables)
       end
     end
   end
@@ -320,30 +325,30 @@ RSpec.describe Serializable do
     context 'when the background colors within the board instance is serialized' do
       it 'returns the serialized form' do
         output = "\x04\b[\aI\"\x18\e[48;2;222;184;135m\x06:\x06ETI\"\x18\e[48;2;255;248;220m\x06;\x00T"
-        expect(game.serialize(game.board.background_colors)).to eq(output)
+        expect(game.serialize(board.background_colors)).to eq(output)
       end
     end
 
     context 'when the background colors within the board instance is serialized' do
       it 'returns the serialized form' do
         output = "\x04\b[\rI\"\x06a\x06:\x06ETI\"\x06b\x06;\x00TI\"\x06c\x06;\x00TI\"\x06d\x06;\x00TI\"\x06e\x06;\x00TI\"\x06f\x06;\x00TI\"\x06g\x06;\x00TI\"\x06h\x06;\x00T"
-        expect(game.serialize(game.board.files)).to eq(output)
+        expect(game.serialize(board.files)).to eq(output)
       end
     end
 
     context 'when the notation within the player1 instance is serialized' do
       it 'returns the serialized form' do
-        game.player1.notation = ['', '', '', '', '', 'O-O']
+        player1.notation = ['', '', '', '', '', 'O-O']
         output = "\x04\b[\vI\"\x00\x06:\x06ET@\x06@\x06@\x06@\x06I\"\bO-O\x06;\x00T"
-        expect(game.serialize(game.player1.notation)).to eq(output)
+        expect(game.serialize(player1.notation)).to eq(output)
       end
     end
 
     context 'when the available destinations within the player2 instance is serialized' do
       it 'returns the serialized form' do
-        game.player2.available_destinations = [[6, 2], [6, 4], [6, 6], [7, 1], [7, 5], [7, 6], [7, 7]]
+        player2.available_destinations = [[6, 2], [6, 4], [6, 6], [7, 1], [7, 5], [7, 6], [7, 7]]
         output = "\x04\b[\f[\ai\vi\a[\ai\vi\t[\ai\vi\v[\ai\fi\x06[\ai\fi\n[\ai\fi\v[\ai\fi\f"
-        expect(game.serialize(game.player2.available_destinations)).to eq(output)
+        expect(game.serialize(player2.available_destinations)).to eq(output)
       end
     end
   end
@@ -483,40 +488,149 @@ RSpec.describe Serializable do
   end
 
   describe '#deserialize' do
-    before do
-      game.player1.notation = ['N', 'f3', '', 'd2', '', nil]
-      game.player2.available_destinations = [
-        [7, 1], [6, 4], [5, 0], [5, 1], [5, 2], [5, 3], [5, 4],
-        [5, 5], [5, 6], [5, 7], [4, 0], [4, 4], [3, 1], [3, 3]
-      ]
+    context 'when a game progress is loaded from the save' do
+      let(:save) { game.load_data('save_1.marshal') }
+      let(:action) { game.deserialize(game, save) }
 
-      game.board.layout[5][2] = game.board.layout[7][1]
-      game.board.layout[7][1] = nil
-      game.board.layout[5][2].current_position = [5, 2]
+      it 'returns the instance variables of the game instance' do
+        expect(game.deserialize(game, save)).to contain_exactly(*[:@player1, :@player2, :@board])
+      end
 
-      game.board.layout[6][4].current_position = nil
-      game.board.layout[6][4] = nil
+      it 'changes the position of the pawn from e2 to e5' do
+        expect{ action }.to change{ player1.pawn[4].current_position }.from([1, 4]).to([4, 4])
+        expect(board.layout[1][4]).to be(nil)
+        expect(board.layout[4][4]).to be(player1.pawn[4])
+      end
 
-      game.board.layout[1][3].current_position = nil
-      game.board.layout[1][3] = nil
+      it 'changes the notation to e5' do
+        expect{ action }.to change{ player1.notation }.from(Array.new(6)).to([nil, nil, nil, "e5", nil])
+      end
 
-      game.board.layout[2][2] = game.board.layout[0][3]
-      game.board.layout[0][3] = nil
-      game.board.layout[2][2].current_position = [2, 2]
+      it 'changes the first move of the pawn from true to false' do
+        expect{ action }.to change{ player1.pawn[4].first_move }.from(true).to(false)
+      end
 
-      game.board.layout[2][5] = game.board.layout[0][6]
-      game.board.layout[0][6] = nil
-      game.board.layout[2][5].current_position = [2, 5]
+      it 'changes the continuous movement from true to false' do
+        expect{ action }.to change{ player1.pawn[4].continuous_movement }.from(true).to(false)
+      end
+
+      it 'changes the position of the pawn from d7 to d4' do
+        expect{ action }.to change{ player2.pawn[3].current_position }.from([6, 3]).to([3, 3])
+        expect(board.layout[6][3]).to be(nil)
+        expect(board.layout[3][3]).to be(player2.pawn[3])
+      end
+
+      it 'changes the notation to d4' do
+        expect{ action }.to change{ player2.notation }.from(Array.new(6)).to([nil, nil, nil, "d4", nil])
+      end
+
+       it 'changes the first move of the pawn from true to false' do
+        expect{ action }.to change{ player2.pawn[3].first_move }.from(true).to(false)
+      end
+
+      it 'changes the continuous movement from true to false' do
+        expect{ action }.to change{ player2.pawn[3].continuous_movement }.from(true).to(false)
+      end
     end
+  end
 
-    let(:current_state) { game.organize_variables(game) }
-    let(:saved_data) { game.serialize(current_state[:@player1]) }
-    let(:saved_data) { Marshal.dump(game.player1.notation) }
+  describe '#save_data' do
+    context 'when the game is set up with some hypothetical situation' do
+      before do
+        0.upto(7) do |idx|
+          board.layout[1][idx].current_position = nil
+          board.layout[1][idx] = nil
 
-    # context '' do
-    #   it '' do
-    #     expect(game.deserialize(game, saved_data)).to eq()
-    #   end
-    # end
+          board.layout[6][idx].current_position = nil
+          board.layout[6][idx] = nil
+
+          unless [4].include?(idx)
+            board.layout[0][idx].current_position = nil
+            board.layout[0][idx] = nil
+
+            board.layout[7][idx].current_position = nil
+            board.layout[7][idx] = nil
+          end
+        end
+      end
+
+      let(:test_file) { 'test_save.marshal' }
+      let(:progress) { {game: { player1: [:king, :queen], player2: [:rook, :pawn, :king], board: {}}} }
+
+      it 'return true upon the existence of the save file' do
+        game.save_data(Marshal.dump(progress), test_file)
+        expect(File.exist?(test_file)).to be(true)
+      end
+
+      it 'returns the progress data after loading the test file' do
+        save = game.load_data(test_file)
+        expect(save).to eq(progress)
+      end
+
+      it 'returns the hashed player1, player2 and board objects if the game instance is examined ' do
+        save = game.load_data(test_file)
+        expect(save[:game]).to eq({ player1: [:king, :queen], player2: [:rook, :pawn, :king], board: {}})
+      end
+
+      it 'returns the values of the hashed objects if each key is examined examined ' do
+        save = game.load_data(test_file)
+        expect(save[:game][:player1]).to eq([:king, :queen])
+        expect(save[:game][:player2]).to eq([:rook, :pawn, :king])
+        expect(save[:game][:board]).to be_empty
+      end
+
+      it 'writes in binary mode' do
+        binary_data = Marshal.dump(progress) + [255].pack('C*') # Add non-UTF8 byte
+        game.save_data(binary_data, test_file)
+        expect(File.binread(test_file)).to eq(binary_data)
+      end
+
+      it 'uses default filename when none specified' do
+        allow(File).to receive(:open).with('save.marshal', 'wb').and_call_original
+        game.save_data(Marshal.dump(progress))
+        expect(File).to have_received(:open).with('save.marshal', 'wb')
+      end
+
+      it 'handles empty data' do
+        game.save_data(Marshal.dump(nil), test_file)
+        expect(game.load_data(test_file)).to be_nil
+      end
+
+      it 'handles large data sets' do
+        large_data = { large: Array.new(10_000) { |i| "item#{i}" } }
+        game.save_data(Marshal.dump(large_data), test_file)
+        expect(Marshal.load(File.read(test_file))).to eq(large_data)
+      end
+    end
+  end
+
+  describe '#load_data' do
+    context 'when the save_1.marshal file is loaded' do
+      let(:progress) { game.load_data('save_1.marshal') }
+      it 'returns data type of the progess as a hash' do
+        expect(progress).to be_a(Hash)
+      end
+
+      it 'returns the instances of the Board and Human classes which correspond to board and the players' do
+        expect(progress[:@board]).to be_a(Board)
+        expect(progress[:@player1]).to be_a(Human)
+        expect(progress[:@player2]).to be_a(Human)
+      end
+
+      it 'raises error when file does not exist' do
+        expect { game.load_data('') }.to raise_error(Errno::ENOENT)
+      end
+
+
+      it 'raises error when file does not exist' do
+        expect { game.load_data('test_saves.marshal') }.to raise_error(Errno::ENOENT)
+      end
+
+      it 'uses default filename when none specified' do
+        allow(File).to receive(:read).with('save.marshal', {:mode=>'rb'}).and_call_original
+        game.load_data
+        expect(File).to have_received(:read).with('save.marshal', {:mode=>'rb'})
+      end
+    end
   end
 end
