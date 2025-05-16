@@ -407,7 +407,15 @@ RSpec.describe Game do
         allow(player1).to receive(:make_choice).and_return('n')
 
       end
+
       context 'when player one makes the first move as Nf3' do
+        it 'prompts player one to enter their move' do
+          msg = "\nPlayer 1, please enter your move:"
+          expect{game.prompt_notation(1, player1)}.to output(include(msg)).to_stdout
+          allow(game).to receive(:win_condition).with(player1).and_return(true)
+          game.play
+        end
+
         it 'returns no on loading game data' do
           expect(game.access_progress('load')).to eq('n')
           allow(game).to receive(:win_condition).with(player1).and_return(true)
@@ -504,14 +512,14 @@ RSpec.describe Game do
       before do
         allow(player1).to receive(:make_choice).and_return('y')
         game.load_progress('save_2.marshal')
-        allow(game).to receive(:prompt_notation).and_return(['', '', '', 'e8', '=Q', nil])
+        allow(game).to receive(:win_condition).with(player1).and_return(true)
+
       end
 
       context 'when player one makes the next move as g8=Q' do
         it 'returns yes on loading game data' do
           expect(game.access_progress('load')).to eq('y')
           expect(game).to receive(:load_progress).with('save_2.marshal')
-          allow(game).to receive(:win_condition).with(player1).and_return(true)
           game.play
         end
 
@@ -524,9 +532,241 @@ RSpec.describe Game do
           expect(player2.pawn[3].current_position).to eq([3, 3])
           expect(player2.pawn[5].current_position).to be_nil
           expect(player2.queen[0].current_position).to eq([5, 3])
-
         end
 
+        it 'prints the warning message' do
+          msg = "\nPlayer 2, you are being checked! Please make your move wisely.\n"
+          expect{ game.warning(player2) }.to output(msg).to_stdout
+          game.play
+        end
+
+        context 'when the pawn at f7 is promoted to e8 as a queen' do
+          let(:action) { game.process_notation(PIECE_STATS, ['', '', '', 'e8', '=Q', nil], player1, nil, nil) }
+
+          it 'returns the pawn being promoted no longer exists' do
+            expect{ action }.to change{ player1.pawn[4].current_position }.from([6, 5]).to(nil)
+            game.play
+          end
+
+          it 'returns the creation of a new queen and it\'s position after the promotion' do
+            expect{ action }.to change{ player1.queen.count }.from(1).to(2)
+            expect(player1.queen[1].current_position).to eq([7, 4])
+            game.play
+          end
+
+          it 'returns the capture of the king' do
+            expect{ action }.to change{ player2.king[0].current_position }.from([7, 4]).to(nil)
+            expect(game.king_captured?(player1)).to be(true)
+            game.play
+          end
+
+          it 'returns the winner as player one' do
+            expect(game.winner?(player1)).to be(true)
+            expect(game.win_condition(player1)).to be(true)
+            allow(game).to receive(:king_captured?).with(player1).and_return(true)
+            msg = "\nPlayer 1 is the winner!"
+            expect{ game.winner?(player1) }.to output(include(msg)).to_stdout
+            game.play
+          end
+
+          it 'prints the move made by player one' do
+            allow(game).to receive(:prompt_notation).and_return(['', '', '', 'e8', '=Q', nil])
+            msg = "\nPlayer 1 just made this move => xe8=Q\n\n"
+            expect{ game.parse_notation(player1) }.to output(msg).to_stdout
+            game.play
+          end
+
+          it 'does not prompt for player to save game' do
+            expect(game).not_to receive(:access_progress).with('save')
+            game.play
+          end
+        end
+      end
+    end
+
+    context 'when the game starts with pre-loaded progress' do
+      before do
+        allow_any_instance_of(Human).to receive(:make_choice).and_return("1\n")
+        allow(player1).to receive(:make_choice).and_return('y')
+        game.load_progress('save_3.marshal')
+        allow(game).to receive(:win_condition).with(player1).and_return(true)
+      end
+
+      context 'when the game save is loaded' do
+        it 'returns yes on loading game data' do
+          expect(game.access_progress('load')).to eq('y')
+          game.play
+        end
+
+        it 'returns player two as a human' do
+          expect(player2).to be_a(Human)
+          game.play
+        end
+
+        it 'returns the new positions for player one\'s pieces' do
+          expect(player1.pawn[2].current_position).to eq([3, 2])
+          expect(player1.pawn[4].current_position).to eq([3, 4])
+          expect(player1.pawn[5].current_position).to be_nil
+        end
+
+        it 'prints the warning message' do
+          msg = "\nPlayer 1, you are being checked! Please make your move wisely.\n"
+          expect{ game.warning(player1) }.to output(msg).to_stdout
+          game.play
+        end
+
+        context 'when the bishop at d1 attempts to capture the pawn at f4' do
+          before { allow(game).to receive(:win_condition).with(player1).and_return(false) }
+          let(:action) { game.process_notation(PIECE_STATS, ['B', '', 'x', 'f4', '', nil], player1, nil, nil) }
+
+          it 'does not change the position of the bishop' do
+            expect{ action }.not_to change{ player1.bishop[0].current_position }
+            expect(player1.bishop[0].current_position).to eq([0, 2])
+            allow(game).to receive(:win_condition).with(player1).and_return(true)
+            game.play
+          end
+
+          it 'does not capture the pawn' do
+            expect{ action }.not_to change{ player2.pawn[4].current_position }
+            expect(player2.pawn[4].current_position).not_to be_nil
+            allow(game).to receive(:win_condition).with(player1).and_return(true)
+            game.play
+          end
+
+          it 'prints the message to indicate an invalid move' do
+            msg = "\nIt is not a valid move. Please try again.\n"
+            expect{ action }.to output(msg).to_stdout
+            allow(game).to receive(:win_condition).with(player1).and_return(true)
+            game.play
+          end
+
+          it 'does not print the notation after movement' do
+            msg = "\nPlayer 1 just made this move => Bxf4\n\n"
+            expect{ game.reveal_move(2, player1) }.not_to output(msg).to_stdout
+            allow(game).to receive(:win_condition).with(player1).and_return(true)
+            game.play
+          end
+
+          it 'returns winner as nil' do
+            expect(game.winner?(player1)).to be_nil
+            allow(game).to receive(:win_condition).with(player1).and_return(true)
+            game.play
+          end
+
+          it 'returns win condition as false' do
+            expect(game.win_condition(player1)).to be(false)
+            allow(game).to receive(:win_condition).with(player1).and_return(true)
+            game.play
+          end
+
+          it 'does not trigger the save progress process' do
+            expect(game).not_to receive(:save_progress).with(player1)
+            allow(game).to receive(:win_condition).with(player1).and_return(true)
+            game.play
+          end
+        end
+
+        context 'when player one makes a valid move to c5' do
+          before do
+            allow(game).to receive(:prompt_notation).with(1, player1).and_return(['', '', '', 'c5', '', nil])
+            allow(game).to receive(:win_condition).with(player2).and_return(false)
+          end
+
+          it 'returns the new positions for player two\'s pieces' do
+            expect(player2.pawn[4].current_position).to eq([3, 5])
+            expect(player2.queen[0].current_position).to eq([3, 7])
+            allow(game).to receive(:win_condition).with(player2).and_return(true)
+          end
+
+          it 'does not print the warning message' do
+            msg = "\nPlayer 2, you are being checked! Please make your move wisely.\n"
+            expect{ game.warning(player2) }.not_to output(msg).to_stdout
+            allow(game).to receive(:win_condition).with(player2).and_return(true)
+            game.play
+          end
+
+          context 'when player two moves the queen from h4 to e1' do
+            let(:action) { game.process_notation(PIECE_STATS, ['Q', '', 'x', 'e1', '', nil], player2, nil, nil) }
+
+            it 'returns the new position of the queen' do
+              expect{ action }.to change{ player2.queen[0].current_position }.from([3, 7]).to([0, 4])
+              allow(game).to receive(:win_condition).with(player2).and_return(true)
+              game.play
+            end
+
+            it 'returns the king of player one being captured' do
+              expect{ action }.to change{ player1.king[0].current_position }.from([0, 4]).to(nil)
+              expect(game.king_captured?(player2)).to be(true)
+            end
+
+            it 'prints the notation after movement' do
+              action
+              msg = "\nPlayer 2 just made this move => Qxe1\n\n"
+              expect{ game.reveal_move(2, player2) }.to output(msg).to_stdout
+              allow(game).to receive(:win_condition).with(player2).and_return(true)
+              game.play
+            end
+
+            it 'returns winner as nil' do
+              action
+              allow(game).to receive(:win_condition).with(player2).and_return(true)
+              expect(game.winner?(player2)).to be(true)
+              expect{ game.winner?(player2) }.to output(include("\nPlayer 2 is the winner!")).to_stdout
+              game.play
+            end
+
+            it 'does not trigger the access progress method' do
+              allow(game).to receive(:win_condition).with(player2).and_return(true)
+              expect(game).not_to receive(:access_progress).with('save')
+              game.play
+            end
+          end
+        end
+      end
+    end
+
+    context 'when the game starts with pre-loaded progress' do
+      before do
+        allow(player1).to receive(:make_choice).and_return('y')
+        game.load_progress('save_2.marshal')
+        allow(game).to receive(:win_condition).with(player1).and_return(false)
+      end
+
+      context 'when the game save is loaded' do
+        it 'returns yes on loading game data' do
+          expect(game.access_progress('load')).to eq('y')
+          allow(game).to receive(:win_condition).with(player1).and_return(true)
+          game.play
+        end
+
+        it 'returns player two as a human' do
+          expect(player2).to be_a(Computer)
+          allow(game).to receive(:win_condition).with(player1).and_return(true)
+          game.play
+        end
+      end
+
+      context 'when both players make several moves' do
+        let(:action_1) { game.process_notation(PIECE_STATS, ['', '', 'x', 'g8', '=Q', nil], player1, nil, nil) }
+        let(:action_2) { game.process_notation(PIECE_STATS, ['Q', '', '' , 'e6', nil], player2, nil, nil) }
+
+        before do
+          allow(player2).to receive(:random_destination).and_return([5, 4])
+          game.process_notation(PIECE_STATS, ['Q', '', '', 'e6', '', nil], player2, nil, nil)
+        end
+
+        # it '' do
+        #   expect(player1.pawn[4].current_position).to be_nil
+        #   expect(game.player1.queen[1].current_position).to eq([7, 6])
+        #   allow(game).to receive(:win_condition).with(player1).and_return(true)
+        #   game.play
+        # end
+
+        it '' do
+          # expect(game.player2.queen[0].current_position).to eq([5, 4])
+          # allow(game).to receive(:win_condition).with(player2).and_return(true)
+          # game.play
+        end
       end
 
     end

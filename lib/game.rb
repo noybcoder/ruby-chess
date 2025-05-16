@@ -109,6 +109,7 @@ class Game
         break if winner?(player) # Exit if game over
 
         parse_notation(player) # Process player move
+
         break if winner?(player) # Exit if game over
       end
       break if players.any?(&method(:win_condition)) # Exit if game over
@@ -204,22 +205,3 @@ class Game
     true
   end
 end
-
-
-# game = Game.new
-
-# 0.upto(7) do |idx|
-#   unless [4].include?(idx)
-#     game.board.layout[7][idx].current_position = nil
-#     game.board.layout[7][idx] = nil
-#   end
-
-#   game.board.layout[1][idx].current_position = nil
-#   game.board.layout[1][idx] = nil
-
-#   game.board.layout[1][idx] = game.board.layout[6][idx]
-#   game.board.layout[6][idx] = nil
-#   game.board.layout[1][idx].current_position = [1, idx]
-# end
-
-# game.play

@@ -33,7 +33,19 @@ module Exceptionable
       moves = checked_moves(player)
       return false if moves.empty?
 
-      (moves - opponent_next_moves(player)).empty?
+      (moves - opponent_next_moves(player)).empty? && !guard_moves?(player)
+    end
+
+    # Public: Checks if player has any moves to protect the king in check
+    # @param player [Player] The player making the move
+    # @return [Boolean] True if no moves available
+    def guard_moves?(player)
+      player.retrieve_pieces.any? do |piece|
+        next if piece.is_a?(King)
+        checked_moves(player).any? do |pos|
+          game_paths(piece, player, pos)
+        end
+      end
     end
 
     # Public: Gets all potential opponent moves that could maintain check
@@ -50,7 +62,19 @@ module Exceptionable
       king = player.king[0]
       return [] if king.checked_positions.nil?
 
-      king.checked_positions.select { |location| checked?(location, player, check: true).any? }
+      king.checked_positions.select { |location| safe_moves?(king, location, player) }
+    end
+
+    # Public: Checks if the king piece can move to anywhere without being captured
+    # @param king [King] The king piece of the player
+    # @param location [Array<Integer, Integer>] The location in which the king piece is in check
+    # @param player [Player] The player making the move
+    # @return [Boolean] True if there is/are available move(s)
+    def safe_moves?(king, location, player)
+      temp_position, king.current_position = king.current_position, nil
+      is_safe = checked?(location, player, check: true).any?
+      king.current_position = temp_position
+      is_safe
     end
 
     # Public: Gets pawn moves that could maintain check
