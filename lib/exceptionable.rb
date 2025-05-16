@@ -59,22 +59,29 @@ module Exceptionable
     # @param player [Player] The player making the move
     # @return [Array<Array<Ineteger>>] Array of positions in which the non-pawn pieces can move to
     def non_pawn_next_moves(player)
-      king = player.king[0]
-      return [] if king.checked_positions.nil?
-
-      king.checked_positions.select { |location| safe_moves?(king, location, player) }
+      player.king[0]&.checked_positions&.select { |location| safe_moves?(player, location) } || []
     end
 
     # Public: Checks if the king piece can move to anywhere without being captured
-    # @param king [King] The king piece of the player
-    # @param location [Array<Integer, Integer>] The location in which the king piece is in check
     # @param player [Player] The player making the move
+    # @param location [Array<Integer, Integer>] The location in which the king piece is in check
     # @return [Boolean] True if there is/are available move(s)
-    def safe_moves?(king, location, player)
-      temp_position, king.current_position = king.current_position, nil
+    def safe_moves?(player, location)
+      pieces = checking_pieces(player, location)
+      pieces.each { |piece, _| piece.current_position = nil }
       is_safe = checked?(location, player, check: true).any?
-      king.current_position = temp_position
+      pieces.each { |piece, loc| piece.current_position = loc}
       is_safe
+    end
+
+    # Public: Gets the opponent pieces that can do check mate and the king piece
+    # @param player [Player] The player making the move
+    # @param location [Array<Integer, Integer>] The location in which the king piece is in check
+    # @return [Array<Chess, Array<Integer, Integer>>] Array of arrays of pieces and their respective locations
+    def checking_pieces(player, location)
+      opponent(player).retrieve_pieces.filter_map do |piece|
+        [piece, piece.current_position] if piece.current_position == location
+      end + [[player.king[0], player.king[0].current_position]]
     end
 
     # Public: Gets pawn moves that could maintain check

@@ -477,8 +477,63 @@ RSpec.describe Exceptionable do
 
       it 'returns all possible moves that non-pawn pieces of the first player can make' do
         checked_moves = [[6, 7], [6, 6], [7, 6]]
+        expect(game.non_pawn_next_moves(player2)).to eq([[6, 7], [6, 6], [7, 6]])
         expect((checked_moves - game.non_pawn_next_moves(player2)).empty?).to eq(true)
       end
+    end
+  end
+
+  describe '#safe_moves?' do
+    context 'when' do
+      before do
+        0.upto(7) do |idx|
+          board.layout[6][idx].current_position = nil
+          board.layout[6][idx] = nil
+
+          unless [4].include?(idx)
+            board.layout[1][idx].current_position = nil
+            board.layout[1][idx] = nil
+
+            board.layout[7][idx].current_position = nil
+            board.layout[7][idx] = nil
+          end
+
+          unless[2, 4].include?(idx)
+            board.layout[0][idx].current_position = nil
+            board.layout[0][idx] = nil
+          end
+        end
+
+        board.layout[7][7] = board.layout[7][4]
+        board.layout[7][4] = nil
+        board.layout[7][7].current_position = [7, 7]
+
+        board.layout[5][7] = board.layout[0][4]
+        board.layout[0][4] = nil
+        board.layout[5][7].current_position = [5, 7]
+
+        board.layout[3][2] = board.layout[0][2]
+        board.layout[0][2] = nil
+        board.layout[3][2].current_position = [3, 2]
+
+        board.layout[6][6] = board.layout[1][4]
+        board.layout[1][4] = nil
+        board.layout[6][6].current_position = [6, 6]
+
+        player2.king[0].checked_positions = [[6, 6], [6, 7], [7, 6]]
+      end
+
+      # it '' do
+      #   expect(game.safe_moves?(player2.king[0], [6, 6], player2)).to be(false)
+      # end
+
+      # it '' do
+      #   expect(game.safe_moves?(player2.king[0], [6, 7], player2)).to be(false)
+      # end
+
+      # it '' do
+      #   expect(game.safe_moves?(player2.king[0], [7, 6], player2)).to be(false)
+      # end
     end
   end
 

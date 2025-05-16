@@ -105,6 +105,10 @@ class Game
 
     loop do
       players.each do |player|
+        p checked_moves(player), non_pawn_next_moves(player), pawn_next_moves(player), guard_moves?(player)
+        p checked?([0, 6], player1, check: false)
+
+
         warning(player) # Show check warning if applicable
         break if winner?(player) # Exit if game over
 
@@ -205,3 +209,43 @@ class Game
     true
   end
 end
+
+game = Game.new
+0.upto(7) do |idx|
+  game.board.layout[1][idx].current_position = nil
+  game.board.layout[1][idx] = nil
+
+  unless [4].include?(idx)
+    game.board.layout[0][idx].current_position = nil
+    game.board.layout[0][idx] = nil
+  end
+
+  unless [6].include?(idx)
+    game.board.layout[6][idx].current_position = nil
+    game.board.layout[6][idx] = nil
+  end
+
+  unless [2, 4].include?(idx)
+    game.board.layout[7][idx].current_position = nil
+    game.board.layout[7][idx] = nil
+  end
+end
+
+game.board.layout[0][7] = game.board.layout[0][4]
+game.board.layout[0][4] = nil
+game.board.layout[0][7].current_position = [0, 7]
+game.board.layout[0][7].checked_positions = [[0, 6], [1, 6], [1, 7]]
+
+game.board.layout[1][6] = game.board.layout[6][6]
+game.board.layout[6][6] = nil
+game.board.layout[1][6].current_position = [1, 6]
+
+game.board.layout[2][7] = game.board.layout[7][4]
+game.board.layout[7][4] = nil
+game.board.layout[2][7].current_position = [2, 7]
+
+game.board.layout[4][1] = game.board.layout[7][2]
+game.board.layout[7][2] = nil
+game.board.layout[4][1].current_position = [4, 1]
+
+game.play
