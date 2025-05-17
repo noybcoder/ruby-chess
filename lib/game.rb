@@ -207,35 +207,17 @@ class Game
 end
 
 # game = Game.new
-# 0.upto(7) do |idx|
-#   game.board.layout[6][idx].current_position = nil
-#   game.board.layout[6][idx] = nil
 
-#   game.board.layout[1][idx].current_position = nil
-#   game.board.layout[1][idx] = nil
+# game.board.layout[1][7].current_position = nil
+# game.board.layout[1][7] = nil
 
-#   unless [4].include?(idx)
-#     game.board.layout[0][idx].current_position = nil
-#     game.board.layout[0][idx] = nil
-#   end
+# game.board.layout[6][4].current_position = nil
+# game.board.layout[6][4] = nil
 
-#   unless[4, 7].include?(idx)
-#     game.board.layout[7][idx].current_position = nil
-#     game.board.layout[7][idx] = nil
-#   end
-# end
+# game.board.layout[3][4] = game.board.layout[0][7]
+# game.board.layout[0][7] = nil
+# game.board.layout[3][4].current_position = [3, 4]
 
-# game.board.layout[0][7] = game.board.layout[7][7]
-# game.board.layout[7][7] = nil
-# game.board.layout[0][7].current_position = [0, 7]
+# game.player2.king[0].checked_positions = [[6, 4]]
 
-# game.board.layout[0][1] = game.board.layout[0][4]
-# game.board.layout[0][4] = nil
-# game.board.layout[0][1].current_position = [0, 1]
-
-# game.board.layout[2][2] = game.board.layout[7][4]
-# game.board.layout[7][4] = nil
-# game.board.layout[2][2].current_position = [2, 2]
-
-# game.player1.king[0].checked_positions = [[0, 0], [0, 2], [1, 0], [1, 1], [1, 2]]
 # game.play
