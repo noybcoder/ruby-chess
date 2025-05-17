@@ -748,27 +748,35 @@ RSpec.describe Game do
 
       context 'when both players make several moves' do
         let(:action_1) { game.process_notation(PIECE_STATS, ['', '', 'x', 'g8', '=Q', nil], player1, nil, nil) }
-        let(:action_2) { game.process_notation(PIECE_STATS, ['Q', '', '' , 'e6', nil], player2, nil, nil) }
 
         before do
-          allow(player2).to receive(:random_destination).and_return([5, 4])
-          game.process_notation(PIECE_STATS, ['Q', '', '', 'e6', '', nil], player2, nil, nil)
+          action_1
+          board.layout[5][4] = board.layout[5][3]
+          board.layout[5][3] = nil
+          board.layout[5][4].current_position = [5, 4]
+          player2.notation = ['Q', nil, nil, 'e6', nil]
         end
 
-        # it '' do
-        #   expect(player1.pawn[4].current_position).to be_nil
-        #   expect(game.player1.queen[1].current_position).to eq([7, 6])
-        #   allow(game).to receive(:win_condition).with(player1).and_return(true)
-        #   game.play
-        # end
+        it 'returns the new positions of the moved pieces of player one' do
+          expect(player1.pawn[4].current_position).to be_nil
+          expect(game.player1.queen[1].current_position).to eq([7, 6])
+          allow(game).to receive(:win_condition).with(player1).and_return(true)
+          game.play
+        end
 
-        it '' do
-          # expect(game.player2.queen[0].current_position).to eq([5, 4])
-          # allow(game).to receive(:win_condition).with(player2).and_return(true)
-          # game.play
+        it 'returns the new positions of the moved pieces of player two' do
+          expect(player2.queen[0].current_position).to eq([5, 4])
+          allow(game).to receive(:win_condition).and_return(true)
+          game.play
+        end
+
+        it 'prints the warning message to player one' do
+          msg = "\nPlayer 1, you are being checked! Please make your move wisely.\n"
+          expect{ game.warning(player1) }.to output(msg).to_stdout
+          allow(game).to receive(:win_condition).and_return(true)
+          game.play
         end
       end
-
     end
   end
 
