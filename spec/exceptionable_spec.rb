@@ -483,8 +483,8 @@ RSpec.describe Exceptionable do
     end
   end
 
-  describe '#safe_moves?' do
-    context 'when' do
+  describe '#dead_moves?' do
+    context 'when the king of player two is in check' do
       before do
         0.upto(7) do |idx|
           board.layout[6][idx].current_position = nil
@@ -523,17 +523,243 @@ RSpec.describe Exceptionable do
         player2.king[0].checked_positions = [[6, 6], [6, 7], [7, 6]]
       end
 
-      # it '' do
-      #   expect(game.safe_moves?(player2.king[0], [6, 6], player2)).to be(false)
-      # end
+      it 'returns true if king attempts to move to g7' do
+        expect(game.dead_moves?(player2, [6, 6])).to be(true)
+      end
 
-      # it '' do
-      #   expect(game.safe_moves?(player2.king[0], [6, 7], player2)).to be(false)
-      # end
+      it 'returns true if king attemps to move to h7' do
+        expect(game.dead_moves?(player2, [6, 7])).to be(true)
+      end
 
-      # it '' do
-      #   expect(game.safe_moves?(player2.king[0], [7, 6], player2)).to be(false)
-      # end
+      it 'returns true if king attempts to move to g8' do
+        expect(game.dead_moves?(player2, [7, 6])).to be(true)
+      end
+    end
+
+    context 'when the king of player one is in check' do
+      before do
+        0.upto(7) do |idx|
+          board.layout[6][idx].current_position = nil
+          board.layout[6][idx] = nil
+
+          unless [5, 7].include?(idx)
+            board.layout[1][idx].current_position = nil
+            board.layout[1][idx] = nil
+          end
+
+          unless [0, 4].include?(idx)
+            board.layout[0][idx].current_position = nil
+            board.layout[0][idx] = nil
+          end
+
+          unless[1, 2, 4].include?(idx)
+            board.layout[7][idx].current_position = nil
+            board.layout[7][idx] = nil
+          end
+        end
+
+        board.layout[0][6] = board.layout[0][4]
+        board.layout[0][4] = nil
+        board.layout[0][6].current_position = [0, 6]
+
+        board.layout[0][5] = board.layout[0][0]
+        board.layout[0][0] = nil
+        board.layout[0][5].current_position = [0, 5]
+
+        board.layout[1][4] = board.layout[7][1]
+        board.layout[7][1] = nil
+        board.layout[1][4].current_position = [1, 4]
+
+        board.layout[7][6] = board.layout[7][4]
+        board.layout[7][4] = nil
+        board.layout[7][6].current_position = [7, 6]
+
+        board.layout[7][0] = board.layout[7][2]
+        board.layout[7][2] = nil
+        board.layout[7][0].current_position = [7, 0]
+
+        player1.king[0].checked_positions = [[0, 7], [1, 6]]
+      end
+
+      it 'returns true if king attempts to move to h1' do
+        expect(game.dead_moves?(player1, [0, 7])).to be(true)
+      end
+
+      it 'returns true if king attemps to move to g2' do
+        expect(game.dead_moves?(player1, [1, 6])).to be(true)
+      end
+    end
+
+    context 'when the king of player two is in check' do
+      before do
+        0.upto(7) do |idx|
+          board.layout[6][idx].current_position = nil
+          board.layout[6][idx] = nil
+
+          board.layout[1][idx].current_position = nil
+          board.layout[1][idx] = nil
+
+          unless [4].include?(idx)
+            board.layout[7][idx].current_position = nil
+            board.layout[7][idx] = nil
+          end
+
+          unless [3, 4].include?(idx)
+            board.layout[0][idx].current_position = nil
+            board.layout[0][idx] = nil
+          end
+        end
+
+        board.layout[7][5] = board.layout[7][4]
+        board.layout[7][4] = nil
+        board.layout[7][5].current_position = [7, 5]
+
+        board.layout[6][6] = board.layout[0][4]
+        board.layout[0][4] = nil
+        board.layout[6][6].current_position = [6, 6]
+
+        board.layout[5][4] = board.layout[0][3]
+        board.layout[0][3] = nil
+        board.layout[5][4].current_position = [5, 4]
+
+        player2.king[0].checked_positions = [[6, 4], [6, 5], [6, 6], [7, 4], [7, 6]]
+      end
+
+      it 'returns true if king attempts to move to e7' do
+        expect(game.dead_moves?(player2, [6, 4])).to be(true)
+      end
+
+      it 'returns true if king attemps to move to f7' do
+        expect(game.dead_moves?(player2, [6, 5])).to be(true)
+      end
+
+      it 'returns true if king attemps to move to g7' do
+        expect(game.dead_moves?(player2, [6, 6])).to be(false)
+      end
+
+      it 'returns true if king attempts to move to e8' do
+        expect(game.dead_moves?(player2, [7, 4])).to be(true)
+      end
+
+      it 'returns true if king attempts to move to g8' do
+        expect(game.dead_moves?(player2, [7, 6])).to be(true)
+      end
+    end
+
+    context 'when the king of player one is in check' do
+      before do
+        0.upto(7) do |idx|
+          board.layout[6][idx].current_position = nil
+          board.layout[6][idx] = nil
+
+          board.layout[1][idx].current_position = nil
+          board.layout[1][idx] = nil
+
+          unless [4].include?(idx)
+            board.layout[0][idx].current_position = nil
+            board.layout[0][idx] = nil
+          end
+
+          unless[4, 7].include?(idx)
+            board.layout[7][idx].current_position = nil
+            board.layout[7][idx] = nil
+          end
+        end
+
+        board.layout[0][7] = board.layout[7][7]
+        board.layout[7][7] = nil
+        board.layout[0][7].current_position = [0, 7]
+
+        board.layout[0][1] = board.layout[0][4]
+        board.layout[0][4] = nil
+        board.layout[0][1].current_position = [0, 1]
+
+        board.layout[2][2] = board.layout[7][4]
+        board.layout[7][4] = nil
+        board.layout[2][2].current_position = [2, 2]
+
+        player1.king[0].checked_positions = [[0, 0], [0, 2], [1, 0], [1, 1], [1, 2]]
+      end
+
+      it 'returns true if king attempts to move to a1' do
+        expect(game.dead_moves?(player1, [0, 0])).to be(true)
+      end
+
+      it 'returns true if king attemps to move to c2' do
+        expect(game.dead_moves?(player1, [0, 2])).to be(true)
+      end
+
+      it 'returns true if king attempts to move to a2' do
+        expect(game.dead_moves?(player1, [1, 0])).to be(false)
+      end
+
+      it 'returns true if king attempts to move to b2' do
+        expect(game.dead_moves?(player1, [1, 1])).to be(true)
+      end
+
+      it 'returns true if king attempts to move to c2' do
+        expect(game.dead_moves?(player1, [1, 2])).to be(true)
+      end
+    end
+  end
+
+  describe '#checking_pieces' do
+    context 'when the game first gets started' do
+      it 'returns nothing' do
+        output = player2.pawn.zip(player2.pawn.map(&:current_position)) +
+        [[player1.king[0], player1.king[0].current_position]]
+
+        [[0, 3], [0, 5], [1, 3], [1, 4], [1, 5]].each do |loc|
+          expect(game.checking_pieces(player1, loc) - output).to be_empty
+        end
+      end
+    end
+
+    context 'when the king of player two is being checked' do
+      before do
+        0.upto(7) do |idx|
+          board.layout[1][idx].current_position = nil
+          board.layout[1][idx] = nil
+
+          board.layout[6][idx].current_position = nil
+          board.layout[6][idx] = nil
+
+          unless [4].include?(idx)
+            board.layout[7][idx].current_position = nil
+            board.layout[7][idx] = nil
+          end
+
+          unless [3, 4].include?(idx)
+            board.layout[0][idx].current_position = nil
+            board.layout[0][idx] = nil
+          end
+        end
+
+        board.layout[6][4] = board.layout[0][4]
+        board.layout[0][4] = nil
+        board.layout[6][4].current_position = [6, 4]
+
+        board.layout[5][5] = board.layout[0][3]
+        board.layout[0][3] = nil
+        board.layout[5][5].current_position = [5, 5]
+
+        player2.king[0].checked_positions = [[6, 3], [6, 4], [6, 5], [7, 3], [7, 5]]
+      end
+
+      let(:reference) { player1.pawn.zip(player1.pawn.map(&:current_position)) +
+        [[player2.king[0], player2.king[0].current_position]]
+      }
+
+      it 'returns the king of player one for the position that is occupied' do
+        output = [[player1.king[0], player1.king[0].current_position]]
+        expect(game.checking_pieces(player2, [6, 4]) - reference).to eq(output)
+      end
+
+      it 'returns empty array for the checked positions that are unoccupied' do
+        [[6, 3], [6, 5], [7, 3], [7, 5]].each do |loc|
+          expect(game.checking_pieces(player2, loc) - reference).to be_empty
+        end
+      end
     end
   end
 

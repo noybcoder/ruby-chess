@@ -59,14 +59,14 @@ module Exceptionable
     # @param player [Player] The player making the move
     # @return [Array<Array<Ineteger>>] Array of positions in which the non-pawn pieces can move to
     def non_pawn_next_moves(player)
-      player.king[0]&.checked_positions&.select { |location| safe_moves?(player, location) } || []
+      player.king[0]&.checked_positions&.select { |location| dead_moves?(player, location) } || []
     end
 
     # Public: Checks if the king piece can move to anywhere without being captured
     # @param player [Player] The player making the move
     # @param location [Array<Integer, Integer>] The location in which the king piece is in check
-    # @return [Boolean] True if there is/are available move(s)
-    def safe_moves?(player, location)
+    # @return [Boolean] False if there is/are available move(s)
+    def dead_moves?(player, location)
       pieces = checking_pieces(player, location)
       pieces.each { |piece, _| piece.current_position = nil }
       is_safe = checked?(location, player, check: true).any?
@@ -80,7 +80,7 @@ module Exceptionable
     # @return [Array<Chess, Array<Integer, Integer>>] Array of arrays of pieces and their respective locations
     def checking_pieces(player, location)
       opponent(player).retrieve_pieces.filter_map do |piece|
-        [piece, piece.current_position] if piece.current_position == location
+        [piece, piece.current_position] if piece.current_position == location || piece.is_a?(Pawn)
       end + [[player.king[0], player.king[0].current_position]]
     end
 
