@@ -205,38 +205,3 @@ class Game
     true
   end
 end
-
-game = Game.new
-
-0.upto(7) do |idx|
-  game.board.layout[1][idx].current_position = nil
-  game.board.layout[1][idx] = nil
-
-  game.board.layout[6][idx].current_position = nil
-  game.board.layout[6][idx] = nil
-
-
-  unless [0, 4, 7].include?(idx)
-    game.board.layout[0][idx].current_position = nil
-    game.board.layout[0][idx] = nil
-  end
-
-  unless [4].include?(idx)
-    game.board.layout[7][idx].current_position = nil
-    game.board.layout[7][idx] = nil
-  end
-end
-
-
-game.board.layout[7][7] = game.board.layout[0][7]
-game.board.layout[0][7] = nil
-game.board.layout[7][7].current_position = [7, 7]
-
-game.board.layout[6][0] = game.board.layout[0][0]
-game.board.layout[0][0] = nil
-game.board.layout[6][0].current_position = [6, 0]
-
-
-game.player2.king[0].checked_positions = [[7, 3], [7, 5], [6, 3], [6, 4], [6, 5]]
-
-game.play
